@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trulli Pijamadas — Invitaciones</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --teal: #5BBFB5;
+  --teal-dark: #3fa399;
+  --teal-light: #e8f7f5;
+  --cream: #F7F2E8;
+  --peach: #F0A987;
+  --text: #3a3a3a;
+  --text-soft: #7a9e9b;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #dff2ef 0%, #c8e9e5 60%, #dff2ef 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 28px 16px 48px;
+}
+
+/* ══════════════════════ FORM PAGE ══════════════════════ */
+#page-form {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.form-logo { text-align: center; }
+.form-logo img { height: 60px; filter: drop-shadow(0 4px 14px rgba(91,191,181,0.35)); }
+
+.form-card {
+  background: white;
+  border-radius: 28px;
+  padding: 36px 36px 32px;
+  width: 100%;
+  box-shadow: 0 8px 48px rgba(91,191,181,0.18);
+  border: 1.5px solid rgba(91,191,181,0.13);
+}
+.form-heading {
+  font-family: 'Comfortaa', cursive;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--teal);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.form-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 30px;
+  color: var(--teal);
+  text-align: center;
+  margin-bottom: 28px;
+}
+.field-group { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label {
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--teal);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.field label svg { opacity: 0.75; flex-shrink: 0; }
+
+.input-wrap { position: relative; display: flex; align-items: center; }
+.input-wrap input, .input-wrap textarea {
+  width: 100%;
+  background: #f6fdfb;
+  border: 1.5px solid rgba(91,191,181,0.22);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: none;
+}
+.input-wrap input:focus, .input-wrap textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(91,191,181,0.12);
+}
+.input-wrap input::placeholder, .input-wrap textarea::placeholder { color: #b8d5d2; font-weight: 500; }
+
+.input-icon-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--teal);
+  opacity: 0.65;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s;
+}
+.input-icon-btn:hover { opacity: 1; }
+
+/* ─── Calendar Picker ─── */
+.picker-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.14);
+  border: 1.5px solid rgba(91,191,181,0.18);
+  padding: 16px;
+  display: none;
+  min-width: 300px;
+}
+.picker-dropdown.open { display: block; }
+
+/* Calendar */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.cal-nav {
+  background: var(--teal-light);
+  border: none;
+  border-radius: 8px;
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--teal);
+  font-size: 14px;
+  transition: background 0.15s;
+}
+.cal-nav:hover { background: #c8e9e4; }
+.cal-month-label {
+  font-family: 'Comfortaa', cursive;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.cal-day-name {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-soft);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 0;
+}
+.cal-day {
+  text-align: center;
+  padding: 7px 2px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.12s, color 0.12s;
+}
+.cal-day:hover { background: var(--teal-light); }
+.cal-day.empty { cursor: default; }
+.cal-day.today { font-weight: 900; color: var(--teal); }
+.cal-day.selected { background: var(--teal); color: white; font-weight: 800; }
+.cal-day.other-month { color: #c5d8d6; }
+
+/* Time Picker */
+.time-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 0 4px;
+}
+.time-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.time-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-soft);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.time-spin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f6fdfb;
+  border: 1.5px solid rgba(91,191,181,0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.time-spin button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--teal);
+  padding: 5px 18px;
+  font-size: 16px;
+  line-height: 1;
+  transition: background 0.12s;
+}
+.time-spin button:hover { background: var(--teal-light); }
+.time-val {
+  font-family: 'Comfortaa', cursive;
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--text);
+  padding: 2px 14px;
+  min-width: 62px;
+  text-align: center;
+}
+.time-sep {
+  font-family: 'Pacifico', cursive;
+  font-size: 28px;
+  color: var(--teal);
+  margin-top: -4px;
+  opacity: 0.7;
+}
+.time-confirm {
+  margin-top: 12px;
+  width: 100%;
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: background 0.15s;
+}
+.time-confirm:hover { background: var(--teal-dark); }
+
+/* ─── Map picker ─── */
+#map-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#map-modal.open { display: flex; }
+.map-container {
+  background: white;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 560px;
+  overflow: hidden;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.2);
+}
+.map-header {
+  padding: 18px 22px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(91,191,181,0.15);
+}
+.map-header h3 {
+  font-family: 'Comfortaa', cursive;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+}
+.map-close {
+  background: var(--teal-light);
+  border: none;
+  border-radius: 8px;
+  width: 30px; height: 30px;
+  cursor: pointer;
+  color: var(--teal);
+  font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+#map-search-wrap {
+  padding: 12px 22px;
+  border-bottom: 1px solid rgba(91,191,181,0.1);
+}
+#map-search {
+  width: 100%;
+  background: #f6fdfb;
+  border: 1.5px solid rgba(91,191,181,0.22);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+}
+#map-search:focus { border-color: var(--teal); }
+#map-suggestions {
+  list-style: none;
+  margin-top: 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(91,191,181,0.15);
+  display: none;
+}
+#map-suggestions li {
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(91,191,181,0.08);
+  transition: background 0.12s;
+}
+#map-suggestions li:hover { background: var(--teal-light); }
+#map-suggestions li:last-child { border-bottom: none; }
+#map-suggestions.open { display: block; }
+#map-frame-wrap { height: 280px; position: relative; background: #e8f0f0; }
+#leaflet-map { width: 100%; height: 100%; }
+#map-click-hint {
+  padding: 6px 22px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--teal);
+  background: rgba(91,191,181,0.08);
+  border-bottom: 1px solid rgba(91,191,181,0.1);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+#map-selected-info {
+  padding: 7px 22px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  min-height: 30px;
+  border-bottom: 1px solid rgba(91,191,181,0.1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#map-selected-info:empty { display: none; }
+.map-confirm-btn {
+  margin: 14px 22px 18px;
+  width: calc(100% - 44px);
+  background: var(--teal);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.map-confirm-btn:hover { background: var(--teal-dark); }
+
+/* ══ BTN PREVIEW ══ */
+.btn-preview {
+  width: 100%;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  padding: 16px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 6px 24px rgba(91,191,181,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-preview:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(91,191,181,0.4); }
+
+/* ══════════════════════ PREVIEW PAGE ══════════════════════ */
+#page-preview {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 580px;
+  gap: 18px;
+}
+.preview-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.btn-back {
+  background: white;
+  border: 1.5px solid rgba(91,191,181,0.22);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--teal);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+.btn-back:hover { background: #f0faf9; }
+.preview-label {
+  font-family: 'Comfortaa', cursive;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+/* ═══ TARJETA INVITACIÓN ═══ */
+#invitation-card {
+  width: 540px;
+  height: 540px;
+  flex-shrink: 0;
+  background: #5BBFB5;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22px;
+  box-shadow: 0 20px 72px rgba(0,0,0,0.16);
+}
+
+.inv-bg { position: absolute; inset: 0; pointer-events: none; }
+.inv-star { position: absolute; color: rgba(255,255,255,0.16); font-style: normal; line-height: 1; }
+
+.inv-garland {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 44px;
+  pointer-events: none;
+}
+.inv-tents {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 100%; height: 100px;
+  pointer-events: none;
+}
+
+/* Marco interior */
+.inv-frame {
+  position: relative;
+  z-index: 10;
+  background: #F7F2E8;
+  border-radius: 20px;
+  width: 416px;
+  padding: 22px 34px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 6px 40px rgba(0,0,0,0.11), 0 1px 0 rgba(255,255,255,0.75) inset;
+  border: 2px solid rgba(255,255,255,0.85);
+}
+.inv-frame::before {
+  content:'';
+  position: absolute;
+  inset: 7px;
+  border-radius: 14px;
+  border: 1.5px dashed rgba(91,191,181,0.22);
+  pointer-events: none;
+}
+
+.inv-logo { height: 46px; margin-bottom: 8px; }
+
+/* ── Bloque saludo + anfitrión ── */
+.inv-header-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  margin-bottom: 4px;
+  width: 100%;
+}
+
+/* Línea 1: "Hola [Nombre] 👋" */
+.inv-hola-line {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #5a5a5a;
+  text-align: center;
+  line-height: 1.3;
+}
+.inv-hola-line .inv-nombre-invitado {
+  font-weight: 900;
+  color: #3a3a3a;
+}
+
+/* Línea 2: "[Anfitrión] te ha invitado a una" */
+.inv-anfitrion-line {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #5a5a5a;
+  text-align: center;
+  line-height: 1.3;
+}
+.inv-anfitrion-line .inv-anfitrion-nombre {
+  font-weight: 900;
+  color: #3a3a3a;
+}
+
+/* Nombre del invitado — protagonista */
+.inv-guest-name {
+  font-family: 'Pacifico', cursive;
+  font-size: 28px;
+  color: var(--peach);
+  line-height: 1.05;
+  text-align: center;
+  margin-bottom: 1px;
+  text-shadow: 1px 2px 0px rgba(200,120,70,0.15);
+  min-height: 34px;
+}
+
+.inv-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 38px;
+  color: #5BBFB5;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 10px;
+  text-shadow: 2px 3px 0px rgba(60,155,148,0.16);
+}
+
+/* Divisor decorativo */
+.inv-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.inv-div-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(91,191,181,0.3), transparent);
+}
+.inv-div-moon { color: #5BBFB5; opacity: 0.4; font-size: 10px; }
+
+/* Info natural — sin etiquetas visibles */
+.inv-info-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 10px;
+  background: rgba(91,191,181,0.06);
+  border-radius: 12px;
+  border: 1px solid rgba(91,191,181,0.12);
+  overflow: hidden;
+}
+
+.inv-info-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 13px;
+  border-bottom: 1px solid rgba(91,191,181,0.1);
+}
+.inv-info-row:last-child { border-bottom: none; }
+
+.inv-info-icon { color: #5BBFB5; opacity: 0.6; flex-shrink: 0; }
+
+.inv-info-text {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #3a3a3a;
+  line-height: 1.3;
+}
+.inv-info-text.empty {
+  color: rgba(91,191,181,0.35);
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* IG Footer */
+.inv-ig {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #5BBFB5;
+  opacity: 0.82;
+}
+.inv-ig span {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+}
+
+/* ══ Action buttons ══ */
+.action-btns { display: flex; gap: 12px; width: 100%; }
+.btn-action {
+  flex: 1;
+  border: none;
+  border-radius: 16px;
+  padding: 15px 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-download {
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+  color: white;
+  box-shadow: 0 6px 24px rgba(91,191,181,0.35);
+}
+.btn-share {
+  background: white;
+  color: var(--teal);
+  border: 1.5px solid rgba(91,191,181,0.22);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.btn-action:hover { transform: translateY(-2px); }
+.btn-download:hover { box-shadow: 0 10px 32px rgba(91,191,181,0.4); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #2d2d2d;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.3s ease;
+  z-index: 999;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Overlay cierra dropdowns */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+}
+.overlay.open { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ PÁGINA 1: FORMULARIO ══════════════════ -->
+<div id="page-form">
+  <div class="form-logo">
+    <img src="https://i.imgur.com/4AMGlsq.png" alt="Trulli Pijamadas" crossorigin="anonymous">
+  </div>
+
+  <div class="form-card">
+    <p class="form-heading">Generador de invitaciones</p>
+    <h1 class="form-title">Completá los datos</h1>
+
+    <div class="field-group">
+
+      <!-- ANFITRIÓN -->
+      <div class="field">
+        <label>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+          Anfitrión
+        </label>
+        <div class="input-wrap">
+          <input type="text" id="f-anfitrion" placeholder="Nombre de quien invita">
+        </div>
+      </div>
+
+      <!-- PARA -->
+      <div class="field">
+        <label>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          Invitado
+        </label>
+        <div class="input-wrap">
+          <input type="text" id="f-para" placeholder="Nombre del invitado/a">
+        </div>
+      </div>
+
+      <!-- FECHA -->
+      <div class="field">
+        <label>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+          Fecha
+        </label>
+        <div class="input-wrap" style="position:relative">
+          <input type="text" id="f-fecha" placeholder="Seleccioná una fecha" readonly style="cursor:pointer; padding-right: 44px;" onclick="toggleCal()">
+          <button class="input-icon-btn" onclick="toggleCal()" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+          </button>
+          <!-- Calendar dropdown -->
+          <div class="picker-dropdown" id="cal-dropdown">
+            <div class="cal-header">
+              <button class="cal-nav" onclick="calNav(-1)" type="button">&#8249;</button>
+              <span class="cal-month-label" id="cal-month-label"></span>
+              <button class="cal-nav" onclick="calNav(1)" type="button">&#8250;</button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HORA -->
+      <div class="field">
+        <label>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>
+          Hora
+        </label>
+        <div class="input-wrap" style="position:relative">
+          <input type="text" id="f-hora" placeholder="Seleccioná la hora" readonly style="cursor:pointer; padding-right:44px;" onclick="toggleTime()">
+          <button class="input-icon-btn" onclick="toggleTime()" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>
+          </button>
+          <!-- Time dropdown -->
+          <div class="picker-dropdown" id="time-dropdown">
+            <div class="time-picker">
+              <div class="time-col">
+                <span class="time-label">Hora</span>
+                <div class="time-spin">
+                  <button onclick="spinTime('h',1)" type="button">▲</button>
+                  <div class="time-val" id="t-h">18</div>
+                  <button onclick="spinTime('h',-1)" type="button">▼</button>
+                </div>
+              </div>
+              <span class="time-sep">:</span>
+              <div class="time-col">
+                <span class="time-label">Min</span>
+                <div class="time-spin">
+                  <button onclick="spinTime('m',1)" type="button">▲</button>
+                  <div class="time-val" id="t-m">00</div>
+                  <button onclick="spinTime('m',-1)" type="button">▼</button>
+                </div>
+              </div>
+            </div>
+            <button class="time-confirm" onclick="confirmTime()" type="button">Confirmar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LUGAR -->
+      <div class="field">
+        <label>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Lugar
+        </label>
+        <div class="input-wrap">
+          <input type="text" id="f-lugar" placeholder="Escribí la dirección o buscá en el mapa" style="padding-right:44px">
+          <button class="input-icon-btn" onclick="openMap()" type="button" title="Buscar en mapa">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn-preview" onclick="showPreview()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      Vista previa
+    </button>
+  </div>
+</div>
+
+<!-- Overlay para cerrar dropdowns -->
+<div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+<!-- ══════════════════ MAPA MODAL ══════════════════ -->
+<div id="map-modal">
+  <div class="map-container">
+    <div class="map-header">
+      <h3>Seleccioná el lugar</h3>
+      <button class="map-close" onclick="closeMap()">✕</button>
+    </div>
+    <div id="map-search-wrap">
+      <input id="map-search" type="text" placeholder="Buscar cualquier dirección..." oninput="searchAddress(this.value)">
+      <ul id="map-suggestions"></ul>
+    </div>
+    <div id="map-click-hint">📍 Hacé click en el mapa para marcar el lugar exacto</div>
+    <div id="map-frame-wrap">
+      <div id="leaflet-map"></div>
+    </div>
+    <div id="map-selected-info"></div>
+    <button class="map-confirm-btn" onclick="confirmMapAddress()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Confirmar dirección
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════ PÁGINA 2: PREVIEW ══════════════════ -->
+<div id="page-preview">
+  <div class="preview-topbar">
+    <button class="btn-back" onclick="showForm()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Editar
+    </button>
+    <span class="preview-label">Vista previa</span>
+    <div style="width:72px"></div>
+  </div>
+
+  <!-- TARJETA -->
+  <div id="invitation-card">
+    <!-- Estrellas fondo -->
+    <div class="inv-bg">
+      <span class="inv-star" style="top:4%;left:3%;font-size:11px">✦</span>
+      <span class="inv-star" style="top:7%;left:13%;font-size:8px">✶</span>
+      <span class="inv-star" style="top:3%;left:83%;font-size:11px">✦</span>
+      <span class="inv-star" style="top:8%;left:90%;font-size:8px">✶</span>
+      <span class="inv-star" style="top:13%;left:52%;font-size:9px">✦</span>
+      <span class="inv-star" style="top:5%;left:45%;font-size:14px">☽</span>
+      <span class="inv-star" style="top:5%;left:25%;font-size:13px">☾</span>
+      <span class="inv-star" style="top:4%;left:67%;font-size:14px">☽</span>
+      <span class="inv-star" style="bottom:19%;left:2%;font-size:11px">✦</span>
+      <span class="inv-star" style="bottom:22%;right:2%;font-size:9px">✶</span>
+      <span class="inv-star" style="bottom:26%;right:6%;font-size:14px">☽</span>
+      <span class="inv-star" style="bottom:21%;left:5%;font-size:13px">☾</span>
+      <span class="inv-star" style="bottom:9%;left:27%;font-size:9px">✦</span>
+      <span class="inv-star" style="bottom:7%;right:22%;font-size:8px">✶</span>
+    </div>
+
+    <!-- Guirnalda -->
+    <svg class="inv-garland" viewBox="0 0 540 44" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><filter id="g2"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <path d="M0,15 Q27,27 54,15 Q81,3 108,15 Q135,27 162,15 Q189,3 216,15 Q243,27 270,15 Q297,3 324,15 Q351,27 378,15 Q405,3 432,15 Q459,27 486,15 Q513,3 540,15" stroke="rgba(255,255,255,0.4)" stroke-width="1" fill="none"/>
+      <g fill="rgba(255,235,150,0.93)" filter="url(#g2)">
+        <circle cx="27" cy="25" r="3.2"/><circle cx="81" cy="14" r="3.2"/><circle cx="135" cy="25" r="3.2"/>
+        <circle cx="189" cy="14" r="3.2"/><circle cx="243" cy="25" r="3.2"/><circle cx="297" cy="14" r="3.2"/>
+        <circle cx="351" cy="25" r="3.2"/><circle cx="405" cy="14" r="3.2"/><circle cx="459" cy="25" r="3.2"/>
+        <circle cx="513" cy="14" r="3.2"/>
+      </g>
+      <g fill="rgba(255,210,110,0.65)" filter="url(#g2)">
+        <circle cx="54" cy="15" r="2.2"/><circle cx="108" cy="15" r="2.2"/><circle cx="162" cy="15" r="2.2"/>
+        <circle cx="216" cy="15" r="2.2"/><circle cx="270" cy="15" r="2.2"/><circle cx="324" cy="15" r="2.2"/>
+        <circle cx="378" cy="15" r="2.2"/><circle cx="432" cy="15" r="2.2"/><circle cx="486" cy="15" r="2.2"/>
+      </g>
+    </svg>
+
+    <!-- Carpas -->
+    <svg class="inv-tents" viewBox="0 0 540 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <g opacity="0.2">
+        <polygon points="15,100 95,100 55,16" fill="#F7F2E8"/>
+        <rect x="54" y="16" width="2" height="9" fill="#F7F2E8"/>
+        <circle cx="55" cy="15" r="3" fill="#F7F2E8"/>
+        <circle cx="36" cy="74" r="2.8" fill="rgba(255,235,150,0.95)"/>
+        <circle cx="74" cy="60" r="2.8" fill="rgba(255,210,120,0.95)"/>
+      </g>
+      <g opacity="0.2">
+        <polygon points="445,100 525,100 485,16" fill="#F7F2E8"/>
+        <rect x="484" y="16" width="2" height="9" fill="#F7F2E8"/>
+        <circle cx="485" cy="15" r="3" fill="#F7F2E8"/>
+        <circle cx="461" cy="74" r="2.8" fill="rgba(255,235,150,0.95)"/>
+        <circle cx="504" cy="60" r="2.8" fill="rgba(255,210,120,0.95)"/>
+      </g>
+      <g opacity="0.12">
+        <polygon points="230,100 310,100 270,25" fill="#F7F2E8"/>
+        <rect x="269" y="25" width="2" height="8" fill="#F7F2E8"/>
+      </g>
+    </svg>
+
+    <!-- Marco -->
+    <div class="inv-frame">
+      <img class="inv-logo" src="https://i.imgur.com/4AMGlsq.png" alt="Trulli" crossorigin="anonymous">
+
+      <div class="inv-header-block">
+        <div class="inv-hola-line">Hola <span id="out-para" class="inv-nombre-invitado">Invitado</span> 👋</div>
+        <div class="inv-anfitrion-line"><span id="out-anfitrion" class="inv-anfitrion-nombre">Anfitrión</span> te ha invitado a una</div>
+      </div>
+
+      <div class="inv-title">Pijamada</div>
+
+      <div class="inv-divider">
+        <div class="inv-div-line"></div>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="#5BBFB5" opacity="0.45"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <div class="inv-div-line"></div>
+      </div>
+
+      <div class="inv-info-block">
+        <div class="inv-info-row">
+          <svg class="inv-info-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+          <div class="inv-info-text" id="out-fecha-hora"></div>
+        </div>
+        <div class="inv-info-row">
+          <svg class="inv-info-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <div class="inv-info-text" id="out-lugar"></div>
+        </div>
+      </div>
+
+      <div class="inv-ig">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="#5BBFB5"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        <span>@trulli.pijamadas</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones acción -->
+  <div class="action-btns">
+    <button class="btn-action btn-download" id="btn-dl" onclick="downloadImage()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Descargar
+    </button>
+    <button class="btn-action btn-share" onclick="shareImage()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      Compartir
+    </button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════
+// CALENDAR
+// ══════════════════════════════════════
+const DIAS = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MESES_LARGO = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DIAS_LARGO = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+let calDate = new Date();
+let calSelected = null;
+
+function toggleCal() {
+  const dd = document.getElementById('cal-dropdown');
+  const td = document.getElementById('time-dropdown');
+  td.classList.remove('open');
+  const isOpen = dd.classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open', isOpen);
+  if (isOpen) renderCal();
+}
+
+function calNav(dir) {
+  calDate = new Date(calDate.getFullYear(), calDate.getMonth() + dir, 1);
+  renderCal();
+}
+
+function renderCal() {
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('cal-month-label').textContent = MESES[m] + ' ' + y;
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+  DIAS.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-day-name';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+  const first = new Date(y, m, 1).getDay();
+  const days = new Date(y, m+1, 0).getDate();
+  const today = new Date();
+  for (let i = 0; i < first; i++) {
+    const el = document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el);
+  }
+  for (let d = 1; d <= days; d++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+    const thisDate = new Date(y, m, d);
+    if (today.getDate()===d && today.getMonth()===m && today.getFullYear()===y) el.classList.add('today');
+    if (calSelected && calSelected.getDate()===d && calSelected.getMonth()===m && calSelected.getFullYear()===y) el.classList.add('selected');
+    el.onclick = () => selectDay(y, m, d);
+    grid.appendChild(el);
+  }
+}
+
+function selectDay(y, m, d) {
+  calSelected = new Date(y, m, d);
+  const diaNombre = DIAS_LARGO[calSelected.getDay()];
+  const diaCap = diaNombre.charAt(0).toUpperCase() + diaNombre.slice(1);
+  const mesNombre = MESES_LARGO[m];
+  const mesNombreCap = mesNombre.charAt(0).toUpperCase() + mesNombre.slice(1);
+  document.getElementById('f-fecha').value = `${diaCap} ${d} de ${mesNombreCap}`;
+  closeAll();
+  updateCard();
+}
+
+// ══════════════════════════════════════
+// TIME PICKER
+// ══════════════════════════════════════
+let tH = 18, tM = 0;
+
+function toggleTime() {
+  const dd = document.getElementById('time-dropdown');
+  const cd = document.getElementById('cal-dropdown');
+  cd.classList.remove('open');
+  const isOpen = dd.classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open', isOpen);
+}
+
+function spinTime(part, dir) {
+  if (part === 'h') { tH = (tH + dir + 24) % 24; document.getElementById('t-h').textContent = String(tH).padStart(2,'0'); }
+  else { tM = (tM + dir*15 + 60) % 60; document.getElementById('t-m').textContent = String(tM).padStart(2,'0'); }
+}
+
+function confirmTime() {
+  document.getElementById('f-hora').value = String(tH).padStart(2,'0') + ':' + String(tM).padStart(2,'0') + ' hs';
+  closeAll();
+  updateCard();
+}
+
+function closeAll() {
+  document.getElementById('cal-dropdown').classList.remove('open');
+  document.getElementById('time-dropdown').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ══════════════════════════════════════
+// MAP — Leaflet + Nominatim (libre, sin límites geográficos)
+// ══════════════════════════════════════
+let mapSelectedAddress = '';
+let mapSelectedLat = null;
+let mapSelectedLon = null;
+let searchTimeout = null;
+let leafletMap = null;
+let leafletMarker = null;
+
+function openMap() {
+  document.getElementById('map-modal').classList.add('open');
+  // Inicializar mapa solo la primera vez
+  setTimeout(() => {
+    if (!leafletMap) {
+      leafletMap = L.map('leaflet-map').setView([-31.5375, -68.5364], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 19
+      }).addTo(leafletMap);
+
+      // Icono personalizado teal
+      const customIcon = L.divIcon({
+        html: `<div style="
+          width:28px;height:28px;
+          background:linear-gradient(135deg,#5BBFB5,#3fa399);
+          border-radius:50% 50% 50% 0;
+          transform:rotate(-45deg);
+          border:2.5px solid white;
+          box-shadow:0 3px 10px rgba(0,0,0,0.25);
+        "></div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+        className: ''
+      });
+
+      // Click en el mapa para seleccionar punto
+      leafletMap.on('click', async (e) => {
+        const { lat, lng } = e.latlng;
+        setMapMarker(lat, lng, customIcon);
+        document.getElementById('map-selected-info').innerHTML = `<span style="color:#aaa;font-style:italic">Buscando dirección...</span>`;
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`, {
+            headers: { 'User-Agent': 'TrulliPijamadas/1.0 (invitaciones@trulli.com.ar)', 'Accept-Language': 'es' }
+          });
+          const data = await res.json();
+          const addr = data.address || {};
+
+          // Construir: Calle Número (O/E/N/S), Localidad
+          let street = addr.road || addr.pedestrian || addr.footway || addr.path || '';
+          let number = addr.house_number || '';
+          // Detectar orientación en el número (ej: "3327 O" o "3327 (O)")
+          // y también del campo quarter/suburb que a veces incluye orientación
+          let orientation = '';
+          if (number) {
+            const match = number.match(/^(\d+)\s*\(?([ONESones])\)?/);
+            if (match) { number = match[1]; orientation = ' (' + match[2].toUpperCase() + ')'; }
+          }
+          // También buscar orientación en suburb/quarter
+          const suburbRaw = addr.suburb || addr.quarter || addr.neighbourhood || '';
+          const orientMatch = suburbRaw.match(/\b([Nn]orte|[Ss]ur|[Ee]ste|[Oo]este)\b/i);
+          if (!orientation && orientMatch) {
+            const map = { norte:'N', sur:'S', este:'E', oeste:'O' };
+            orientation = ' (' + (map[orientMatch[1].toLowerCase()] || orientMatch[1][0].toUpperCase()) + ')';
+          }
+
+          const city = addr.city || addr.town || addr.village || addr.county || addr.state_district || '';
+          const dept = addr.state_district || addr.county || '';
+
+          let parts = [];
+          if (street) {
+            let streetPart = street;
+            if (number) streetPart += ' ' + number + orientation;
+            parts.push(streetPart);
+          }
+          if (city) parts.push(city);
+          else if (dept) parts.push(dept);
+
+          const formatted = parts.length ? parts.join(', ') : data.display_name.split(',').slice(0,3).join(', ');
+
+          mapSelectedAddress = formatted;
+          mapSelectedLat = lat;
+          mapSelectedLon = lng;
+          document.getElementById('map-selected-info').innerHTML = `📍 <span>${formatted}</span>`;
+          document.getElementById('map-search').value = formatted;
+        } catch(err) {
+          // Si falla el geocoding, dejar vacío en lugar de mostrar coordenadas
+          document.getElementById('map-selected-info').innerHTML = `<span style="color:#e07a5f">No se pudo obtener la dirección. Intentá buscarla arriba.</span>`;
+          mapSelectedAddress = '';
+        }
+      });
+    } else {
+      leafletMap.invalidateSize();
+    }
+  }, 150);
+}
+
+function setMapMarker(lat, lng, icon) {
+  if (!icon) {
+    icon = L.divIcon({
+      html: `<div style="
+        width:28px;height:28px;
+        background:linear-gradient(135deg,#5BBFB5,#3fa399);
+        border-radius:50% 50% 50% 0;
+        transform:rotate(-45deg);
+        border:2.5px solid white;
+        box-shadow:0 3px 10px rgba(0,0,0,0.25);
+      "></div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      className: ''
+    });
+  }
+  if (leafletMarker) leafletMap.removeLayer(leafletMarker);
+  leafletMarker = L.marker([lat, lng], { icon }).addTo(leafletMap);
+  leafletMap.setView([lat, lng], Math.max(leafletMap.getZoom(), 16));
+}
+
+function closeMap() {
+  document.getElementById('map-modal').classList.remove('open');
+  document.getElementById('map-suggestions').classList.remove('open');
+  document.getElementById('map-suggestions').innerHTML = '';
+}
+
+function searchAddress(val) {
+  clearTimeout(searchTimeout);
+  const sug = document.getElementById('map-suggestions');
+  if (val.length < 3) { sug.classList.remove('open'); sug.innerHTML=''; return; }
+  searchTimeout = setTimeout(async () => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=6&addressdetails=1`, {
+        headers: { 'User-Agent': 'TrulliPijamadas/1.0 (invitaciones@trulli.com.ar)', 'Accept-Language': 'es' }
+      });
+      const data = await res.json();
+      sug.innerHTML = '';
+      if (!data.length) {
+        sug.innerHTML = '<li style="color:#aaa;cursor:default">Sin resultados</li>';
+        sug.classList.add('open');
+        return;
+      }
+      data.forEach(item => {
+        const li = document.createElement('li');
+        const addr = item.address;
+        let formatted = '';
+        if (addr.road) {
+          formatted = addr.road;
+          if (addr.house_number) formatted += ' ' + addr.house_number;
+          const city = addr.city || addr.town || addr.village || addr.suburb || addr.county || '';
+          if (city) formatted += ', ' + city;
+          if (addr.country) formatted += ', ' + addr.country;
+        } else {
+          formatted = item.display_name.split(',').slice(0,3).join(', ');
+        }
+        li.textContent = formatted;
+        li.onclick = () => selectMapAddress(formatted, item.lat, item.lon);
+        sug.appendChild(li);
+      });
+      sug.classList.add('open');
+    } catch(e) { console.error(e); }
+  }, 400);
+}
+
+function selectMapAddress(address, lat, lon) {
+  mapSelectedAddress = address;
+  mapSelectedLat = parseFloat(lat);
+  mapSelectedLon = parseFloat(lon);
+  document.getElementById('map-search').value = address;
+  document.getElementById('map-suggestions').classList.remove('open');
+  document.getElementById('map-selected-info').innerHTML = `📍 <span>${address}</span>`;
+  if (leafletMap) setMapMarker(mapSelectedLat, mapSelectedLon);
+}
+
+function confirmMapAddress() {
+  const val = mapSelectedAddress || document.getElementById('map-search').value;
+  if (val) {
+    document.getElementById('f-lugar').value = val;
+    updateCard();
+  }
+  closeMap();
+}
+
+// ══════════════════════════════════════
+// CARD UPDATE (live)
+// ══════════════════════════════════════
+function updateCard() {
+  const para      = document.getElementById('f-para').value.trim();
+  const anfitrion = document.getElementById('f-anfitrion').value.trim();
+  const fecha = document.getElementById('f-fecha').value.trim();
+  const hora  = document.getElementById('f-hora').value.trim();
+  const lugar = document.getElementById('f-lugar').value.trim();
+
+  // Invitado — inline en "Hola [Nombre] 👋"
+  const outPara = document.getElementById('out-para');
+  outPara.textContent = para || 'Invitado';
+
+  // Anfitrión — inline en "[Anfitrión] te ha invitado a una"
+  const outAnfitrion = document.getElementById('out-anfitrion');
+  outAnfitrion.textContent = anfitrion || 'Anfitrión';
+
+  // Fecha + hora fusionados
+  const outFechaHora = document.getElementById('out-fecha-hora');
+  let fechaHoraTxt = '';
+  if (fecha && hora) fechaHoraTxt = fecha + '  ·  ' + hora;
+  else if (fecha) fechaHoraTxt = fecha;
+  else if (hora) fechaHoraTxt = hora;
+  if (fechaHoraTxt) { outFechaHora.textContent = fechaHoraTxt; outFechaHora.classList.remove('empty'); }
+  else { outFechaHora.textContent = 'Fecha y hora por confirmar'; outFechaHora.classList.add('empty'); }
+
+  // Lugar
+  const outLugar = document.getElementById('out-lugar');
+  if (lugar) { outLugar.textContent = lugar; outLugar.classList.remove('empty'); }
+  else { outLugar.textContent = 'Dirección del evento'; outLugar.classList.add('empty'); }
+}
+
+// Live update al escribir
+['f-para','f-lugar','f-anfitrion'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateCard);
+});
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function showPreview() {
+  updateCard();
+  document.getElementById('page-form').style.display    = 'none';
+  document.getElementById('page-preview').style.display = 'flex';
+  window.scrollTo(0,0);
+}
+function showForm() {
+  document.getElementById('page-form').style.display    = 'flex';
+  document.getElementById('page-preview').style.display = 'none';
+}
+
+// ══════════════════════════════════════
+// DOWNLOAD / SHARE
+// ══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+async function captureCard() {
+  const card = document.getElementById('invitation-card');
+  const W = 540, H = 540, R = 22; // ancho, alto, border-radius de la tarjeta
+  const SCALE = 2;
+
+  // Forzar tamaño fijo para captura consistente
+  const prevW = card.style.width, prevH = card.style.height;
+  card.style.width  = W + 'px';
+  card.style.height = H + 'px';
+  card.scrollIntoView({ block: 'start', behavior: 'instant' });
+  await new Promise(r => setTimeout(r, 80));
+
+  // Capturar con html2canvas
+  const raw = await html2canvas(card, {
+    scale: SCALE,
+    useCORS: true,
+    allowTaint: false,
+    backgroundColor: '#5BBFB5',
+    logging: false,
+    width: W, height: H,
+    windowWidth: W, windowHeight: H,
+    x: 0, y: 0, scrollX: 0, scrollY: 0,
+  });
+
+  // Restaurar tamaño
+  card.style.width  = prevW;
+  card.style.height = prevH;
+
+  // Crear canvas final con esquinas redondeadas aplicadas mediante clip
+  const out = document.createElement('canvas');
+  out.width  = W * SCALE;
+  out.height = H * SCALE;
+  const ctx = out.getContext('2d');
+  const r = R * SCALE;
+  const w = out.width, h = out.height;
+
+  // Dibujar path redondeado y clipear
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(w - r, 0);
+  ctx.quadraticCurveTo(w, 0, w, r);
+  ctx.lineTo(w, h - r);
+  ctx.quadraticCurveTo(w, h, w - r, h);
+  ctx.lineTo(r, h);
+  ctx.quadraticCurveTo(0, h, 0, h - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.clip();
+
+  // Dibujar la captura dentro del clip
+  ctx.drawImage(raw, 0, 0);
+
+  return out;
+}
+
+async function downloadImage() {
+  const btn = document.getElementById('btn-dl');
+  btn.disabled = true;
+  btn.textContent = 'Generando...';
+  try {
+    const canvas = await captureCard();
+    const link = document.createElement('a');
+    const nombre = document.getElementById('f-para').value || 'invitacion';
+    link.download = 'trulli-' + nombre.toLowerCase().replace(/\s+/g,'-') + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('✓ Invitación descargada');
+  } catch(e) { showToast('Error al generar imagen'); }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar';
+}
+
+async function shareImage() {
+  try {
+    const canvas = await captureCard();
+    canvas.toBlob(async blob => {
+      const nombre = document.getElementById('f-para').value || 'invitacion';
+      const file = new File([blob], 'trulli-' + nombre.toLowerCase().replace(/\s+/g,'-') + '.png', { type: 'image/png' });
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: '¡Pijamada Trulli!', text: '¡Estás invitado/a! 🌙' });
+        } catch(e) {
+          if (e.name !== 'AbortError') fallbackDl(canvas);
+        }
+      } else { fallbackDl(canvas); }
+    }, 'image/png');
+  } catch(e) { showToast('Error al compartir'); }
+}
+
+function fallbackDl(canvas) {
+  const link = document.createElement('a');
+  link.download = 'trulli-pijamada.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('Guardá la imagen y compartila por WhatsApp');
+}
+
+// Init
+renderCal();
+updateCard();
+</script>
+</body>
+</html>
