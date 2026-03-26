@@ -473,28 +473,23 @@ body {
   display: block;
 }
 
-/* Capa overlay con todo el texto */
+/* Capa overlay — posicionamiento absoluto preciso sobre la imagen */
 .inv-overlay {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   z-index: 10;
   pointer-events: none;
-  /* Recuadro crema empieza ~27% = 173px, termina ~72% = 461px */
-  padding-top: 188px;
-  padding-bottom: 178px;
 }
 
-/* Bloque saludo */
+/* Saludo: debajo del logo Trulli (~248px en 640) */
 .inv-header-block {
+  position: absolute;
+  top: 248px;
+  left: 0; right: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  margin-bottom: 10px;
-  width: 100%;
   padding: 0 52px;
 }
 .inv-hola-line {
@@ -522,16 +517,14 @@ body {
   color: #3a3a3a;
 }
 
-/* Spacer empuja info hacia abajo */
-.inv-spacer { flex: 1; }
-
-/* Info fecha/lugar */
+/* Info fecha/lugar: debajo de "Pijamada" (~370px en 640) */
 .inv-info-block {
-  width: calc(100% - 80px);
+  position: absolute;
+  top: 368px;
+  left: 40px; right: 40px;
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-bottom: 8px;
   background: rgba(149,206,187,0.10);
   border-radius: 10px;
   border: 1px solid rgba(149,206,187,0.22);
@@ -559,14 +552,17 @@ body {
   font-style: italic;
 }
 
-/* IG Footer */
+/* IG Footer: justo antes del borde inferior del recuadro (~438px) */
 .inv-ig {
+  position: absolute;
+  top: 438px;
+  left: 0; right: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   color: #95CEBB;
   opacity: 0.9;
-  margin-bottom: 2px;
 }
 .inv-ig span {
   font-family: 'Nunito', sans-serif;
@@ -804,7 +800,6 @@ body {
         <div class="inv-anfitrion-line"><span id="out-anfitrion" class="inv-anfitrion-nombre">Anfitrión</span> te ha invitado a una</div>
       </div>
 
-      <div class="inv-spacer"></div>
 
       <div class="inv-info-block">
         <div class="inv-info-row">
