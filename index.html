@@ -10,106 +10,181 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root {
-  --teal: #95CEBB;
-  --teal-dark: #6fb8a7;
-  --teal-light: #e8f7f5;
-  --cream: #F7F2E8;
-  --peach: #F0A987;
-  --text: #3a3a3a;
-  --text-soft: #7a9e9b;
+  /* ── Paleta oficial Trulli ── */
+  --acqua:       #5BB8B0;
+  --acqua-mid:   #74C3BC;
+  --acqua-light: #A8D8D4;
+  --acqua-pale:  #D4EDEA;
+  --acqua-ghost: #EAF6F5;
+  --calce:       #FDFBE5;
+  --notte:       #1C4753;
+  --notte-mid:   #2A5F70;
+  --sand:        #D9CFA8;
+
+  /* aliases usados internamente */
+  --teal:        var(--acqua);
+  --teal-dark:   #4AA9A1;
+  --teal-light:  var(--acqua-ghost);
+  --cream:       var(--calce);
+  --text:        var(--notte);
+  --text-soft:   #5A8A96;
 }
+
 * { margin:0; padding:0; box-sizing:border-box; }
+
 body {
   font-family: 'Nunito', sans-serif;
-  background: linear-gradient(135deg, #e8f5f1 0%, #d4ede8 60%, #e8f5f1 100%);
+  background: var(--calce);
   min-height: 100vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 28px 16px 48px;
+  padding: 0 0 60px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ── Fondo decorativo ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(91,184,176,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,184,176,0.12) 0%, transparent 55%),
+    var(--calce);
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* ══════════════════════ FORM PAGE ══════════════════════ */
 #page-form {
   width: 100%;
-  max-width: 500px;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 0;
+  position: relative;
+  z-index: 1;
 }
-.form-logo { text-align: center; }
-.form-logo img { height: 60px; filter: drop-shadow(0 4px 14px rgba(149,206,187,0.35)); }
 
+/* ── Hero header ── */
+.form-hero {
+  width: 100%;
+  background: var(--notte);
+  padding: 40px 32px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  position: relative;
+  overflow: hidden;
+}
+.form-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: rgba(91,184,176,0.12);
+  pointer-events: none;
+}
+.form-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -40px;
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  background: rgba(91,184,176,0.08);
+  pointer-events: none;
+}
+
+.form-logo img {
+  height: 54px;
+  filter: brightness(0) invert(1);
+  display: block;
+}
+
+/* Título "Completá tus datos" desde imagen */
+.form-title-img {
+  width: 100%;
+  max-width: 300px;
+  display: block;
+  /* invertir a blanco */
+  filter: brightness(0) invert(1);
+}
+
+/* ── Ola decorativa entre hero y card ── */
+.form-wave {
+  width: 100%;
+  display: block;
+  margin-bottom: -2px;
+  line-height: 0;
+}
+.form-wave svg {
+  display: block;
+  width: 100%;
+}
+
+/* ── Card principal ── */
 .form-card {
   background: white;
-  border-radius: 28px;
-  padding: 36px 36px 32px;
   width: 100%;
-  box-shadow: 0 8px 48px rgba(149,206,187,0.18);
-  border: 1.5px solid rgba(149,206,187,0.13);
+  padding: 32px 28px 28px;
+  box-shadow: 0 4px 40px rgba(28,71,83,0.08);
 }
-.form-heading {
-  font-family: 'Comfortaa', cursive;
-  font-weight: 700;
-  font-size: 11px;
-  color: var(--teal);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  text-align: center;
-  margin-bottom: 4px;
-}
-.form-title {
-  font-family: 'Pacifico', cursive;
-  font-size: 30px;
-  color: var(--teal);
-  text-align: center;
-  margin-bottom: 28px;
-}
-.field-group { display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px; }
 
-.field { display: flex; flex-direction: column; gap: 6px; }
+.field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+
 .field label {
   font-weight: 800;
-  font-size: 11px;
-  color: var(--teal);
-  letter-spacing: 0.13em;
+  font-size: 10.5px;
+  color: var(--notte);
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+  opacity: 0.75;
 }
-.field label svg { opacity: 0.75; flex-shrink: 0; }
+.field label svg { opacity: 1; flex-shrink: 0; color: var(--acqua); }
 
 .input-wrap { position: relative; display: flex; align-items: center; }
 .input-wrap input, .input-wrap textarea {
   width: 100%;
-  background: #f6fdfb;
-  border: 1.5px solid rgba(149,206,187,0.22);
-  border-radius: 12px;
-  padding: 12px 16px;
+  background: var(--calce);
+  border: 1.5px solid rgba(91,184,176,0.25);
+  border-radius: 14px;
+  padding: 13px 18px;
   font-family: 'Nunito', sans-serif;
   font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
+  font-weight: 700;
+  color: var(--notte);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   resize: none;
 }
 .input-wrap input:focus, .input-wrap textarea:focus {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(149,206,187,0.12);
+  border-color: var(--acqua);
+  background: white;
+  box-shadow: 0 0 0 3.5px rgba(91,184,176,0.13);
 }
-.input-wrap input::placeholder, .input-wrap textarea::placeholder { color: #b8d5d2; font-weight: 500; }
+.input-wrap input::placeholder, .input-wrap textarea::placeholder {
+  color: rgba(91,184,176,0.55);
+  font-weight: 500;
+}
 
 .input-icon-btn {
   position: absolute;
-  right: 10px;
+  right: 12px;
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--teal);
-  opacity: 0.65;
+  color: var(--acqua);
+  opacity: 0.7;
   padding: 4px;
   display: flex;
   align-items: center;
@@ -117,23 +192,29 @@ body {
 }
 .input-icon-btn:hover { opacity: 1; }
 
+/* ─── Separador decorativo entre campos ─── */
+.field-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(91,184,176,0.18), transparent);
+}
+
 /* ─── Calendar Picker ─── */
 .picker-dropdown {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   left: 0;
   z-index: 200;
   background: white;
-  border-radius: 18px;
-  box-shadow: 0 12px 48px rgba(0,0,0,0.14);
-  border: 1.5px solid rgba(149,206,187,0.18);
-  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 16px 56px rgba(28,71,83,0.16);
+  border: 1.5px solid rgba(91,184,176,0.18);
+  padding: 18px;
   display: none;
   min-width: 300px;
 }
 .picker-dropdown.open { display: block; }
 
-/* Calendar */
 .cal-header {
   display: flex;
   align-items: center;
@@ -141,22 +222,22 @@ body {
   margin-bottom: 14px;
 }
 .cal-nav {
-  background: var(--teal-light);
+  background: var(--acqua-ghost);
   border: none;
-  border-radius: 8px;
-  width: 30px; height: 30px;
+  border-radius: 9px;
+  width: 32px; height: 32px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  color: var(--teal);
-  font-size: 14px;
+  color: var(--notte);
+  font-size: 15px;
   transition: background 0.15s;
 }
-.cal-nav:hover { background: #c8e9e4; }
+.cal-nav:hover { background: var(--acqua-pale); }
 .cal-month-label {
   font-family: 'Comfortaa', cursive;
   font-weight: 700;
   font-size: 13px;
-  color: var(--text);
+  color: var(--notte);
   letter-spacing: 0.05em;
 }
 .cal-grid {
@@ -176,17 +257,17 @@ body {
 .cal-day {
   text-align: center;
   padding: 7px 2px;
-  border-radius: 8px;
+  border-radius: 9px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  color: var(--text);
+  color: var(--notte);
   transition: background 0.12s, color 0.12s;
 }
-.cal-day:hover { background: var(--teal-light); }
+.cal-day:hover { background: var(--acqua-ghost); }
 .cal-day.empty { cursor: default; }
-.cal-day.today { font-weight: 900; color: var(--teal); }
-.cal-day.selected { background: var(--teal); color: white; font-weight: 800; }
+.cal-day.today { font-weight: 900; color: var(--acqua); }
+.cal-day.selected { background: var(--acqua); color: white; font-weight: 800; }
 .cal-day.other-month { color: #c5d8d6; }
 
 /* Time Picker */
@@ -214,27 +295,27 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #f6fdfb;
-  border: 1.5px solid rgba(149,206,187,0.2);
-  border-radius: 12px;
+  background: var(--calce);
+  border: 1.5px solid rgba(91,184,176,0.2);
+  border-radius: 14px;
   overflow: hidden;
 }
 .time-spin button {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--teal);
-  padding: 5px 18px;
-  font-size: 16px;
+  color: var(--acqua);
+  padding: 6px 18px;
+  font-size: 15px;
   line-height: 1;
   transition: background 0.12s;
 }
-.time-spin button:hover { background: var(--teal-light); }
+.time-spin button:hover { background: var(--acqua-ghost); }
 .time-val {
   font-family: 'Comfortaa', cursive;
   font-weight: 700;
   font-size: 26px;
-  color: var(--text);
+  color: var(--notte);
   padding: 2px 14px;
   min-width: 62px;
   text-align: center;
@@ -242,18 +323,18 @@ body {
 .time-sep {
   font-family: 'Pacifico', cursive;
   font-size: 28px;
-  color: var(--teal);
+  color: var(--acqua);
   margin-top: -4px;
   opacity: 0.7;
 }
 .time-confirm {
-  margin-top: 12px;
+  margin-top: 14px;
   width: 100%;
-  background: var(--teal);
+  background: var(--notte);
   color: white;
   border: none;
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 11px;
+  padding: 11px;
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
   font-size: 13px;
@@ -261,7 +342,7 @@ body {
   letter-spacing: 0.06em;
   transition: background 0.15s;
 }
-.time-confirm:hover { background: var(--teal-dark); }
+.time-confirm:hover { background: var(--notte-mid); }
 
 /* ─── Map picker ─── */
 #map-modal {
@@ -269,7 +350,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: rgba(0,0,0,0.5);
+  background: rgba(28,71,83,0.55);
   align-items: center;
   justify-content: center;
   padding: 20px;
@@ -281,67 +362,67 @@ body {
   width: 100%;
   max-width: 560px;
   overflow: hidden;
-  box-shadow: 0 20px 80px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 80px rgba(28,71,83,0.25);
 }
 .map-header {
   padding: 18px 22px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(149,206,187,0.15);
+  border-bottom: 1px solid rgba(91,184,176,0.15);
 }
 .map-header h3 {
   font-family: 'Comfortaa', cursive;
   font-weight: 700;
   font-size: 15px;
-  color: var(--text);
+  color: var(--notte);
 }
 .map-close {
-  background: var(--teal-light);
+  background: var(--acqua-ghost);
   border: none;
   border-radius: 8px;
   width: 30px; height: 30px;
   cursor: pointer;
-  color: var(--teal);
+  color: var(--notte);
   font-size: 16px;
   display: flex; align-items: center; justify-content: center;
 }
 #map-search-wrap {
   padding: 12px 22px;
-  border-bottom: 1px solid rgba(149,206,187,0.1);
+  border-bottom: 1px solid rgba(91,184,176,0.1);
 }
 #map-search {
   width: 100%;
-  background: #f6fdfb;
-  border: 1.5px solid rgba(149,206,187,0.22);
+  background: var(--calce);
+  border: 1.5px solid rgba(91,184,176,0.22);
   border-radius: 10px;
   padding: 10px 14px;
   font-family: 'Nunito', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--notte);
   outline: none;
 }
-#map-search:focus { border-color: var(--teal); }
+#map-search:focus { border-color: var(--acqua); }
 #map-suggestions {
   list-style: none;
   margin-top: 6px;
   max-height: 160px;
   overflow-y: auto;
   border-radius: 10px;
-  border: 1px solid rgba(149,206,187,0.15);
+  border: 1px solid rgba(91,184,176,0.15);
   display: none;
 }
 #map-suggestions li {
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--notte);
   cursor: pointer;
-  border-bottom: 1px solid rgba(149,206,187,0.08);
+  border-bottom: 1px solid rgba(91,184,176,0.08);
   transition: background 0.12s;
 }
-#map-suggestions li:hover { background: var(--teal-light); }
+#map-suggestions li:hover { background: var(--acqua-ghost); }
 #map-suggestions li:last-child { border-bottom: none; }
 #map-suggestions.open { display: block; }
 #map-frame-wrap { height: 280px; position: relative; background: #e8f0f0; }
@@ -350,9 +431,9 @@ body {
   padding: 6px 22px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--teal);
-  background: rgba(149,206,187,0.08);
-  border-bottom: 1px solid rgba(149,206,187,0.1);
+  color: var(--acqua);
+  background: rgba(91,184,176,0.08);
+  border-bottom: 1px solid rgba(91,184,176,0.1);
   text-align: center;
   letter-spacing: 0.02em;
 }
@@ -360,9 +441,9 @@ body {
   padding: 7px 22px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--text);
+  color: var(--notte);
   min-height: 30px;
-  border-bottom: 1px solid rgba(149,206,187,0.1);
+  border-bottom: 1px solid rgba(91,184,176,0.1);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -371,7 +452,7 @@ body {
 .map-confirm-btn {
   margin: 14px 22px 18px;
   width: calc(100% - 44px);
-  background: var(--teal);
+  background: var(--notte);
   color: white;
   border: none;
   border-radius: 12px;
@@ -386,29 +467,72 @@ body {
   justify-content: center;
   gap: 8px;
 }
-.map-confirm-btn:hover { background: var(--teal-dark); }
+.map-confirm-btn:hover { background: var(--notte-mid); }
 
 /* ══ BTN PREVIEW ══ */
+.btn-preview-wrap {
+  padding: 0 28px 32px;
+  background: white;
+  width: 100%;
+}
 .btn-preview {
   width: 100%;
-  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+  background: var(--notte);
   color: white;
   border: none;
   border-radius: 16px;
-  padding: 16px;
+  padding: 17px;
   font-family: 'Nunito', sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 6px 24px rgba(149,206,187,0.35);
-  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 8px 28px rgba(28,71,83,0.22);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  position: relative;
+  overflow: hidden;
 }
-.btn-preview:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(149,206,187,0.4); }
+.btn-preview::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(91,184,176,0.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+.btn-preview:hover {
+  background: var(--notte-mid);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(28,71,83,0.28);
+}
+
+/* ── Pie del formulario ── */
+.form-footer {
+  background: white;
+  width: 100%;
+  padding: 0 28px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.form-footer-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--acqua-light);
+}
+.form-footer-dot.active { background: var(--acqua); width: 18px; border-radius: 3px; }
+.form-footer-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--acqua-light);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
 
 /* ══════════════════════ PREVIEW PAGE ══════════════════════ */
 #page-preview {
@@ -418,6 +542,9 @@ body {
   width: 100%;
   max-width: 580px;
   gap: 18px;
+  padding: 28px 16px 48px;
+  position: relative;
+  z-index: 1;
 }
 .preview-topbar {
   display: flex;
@@ -427,28 +554,28 @@ body {
 }
 .btn-back {
   background: white;
-  border: 1.5px solid rgba(149,206,187,0.22);
+  border: 1.5px solid rgba(91,184,176,0.22);
   border-radius: 12px;
   padding: 10px 18px;
   font-family: 'Nunito', sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: var(--teal);
+  color: var(--notte);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   transition: background 0.15s;
 }
-.btn-back:hover { background: #f0faf9; }
+.btn-back:hover { background: var(--acqua-ghost); }
 .preview-label {
   font-family: 'Comfortaa', cursive;
   font-size: 11px;
   font-weight: 700;
-  color: var(--teal);
+  color: var(--acqua);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  opacity: 0.65;
+  opacity: 0.7;
 }
 
 /* ═══ TARJETA INVITACIÓN ═══ */
@@ -462,7 +589,6 @@ body {
   box-shadow: 0 20px 72px rgba(0,0,0,0.22);
 }
 
-/* Imagen de fondo del diseñador */
 .inv-bg-img {
   position: absolute;
   inset: 0;
@@ -473,7 +599,6 @@ body {
   display: block;
 }
 
-/* Capa overlay — posicionamiento absoluto preciso sobre la imagen */
 .inv-overlay {
   position: absolute;
   inset: 0;
@@ -481,11 +606,9 @@ body {
   pointer-events: none;
 }
 
-/* ── FIX 1: Saludo bajado y centrado entre logo (~175px) y "Pijamada" (~330px)
-   Centro aprox = 252px. Con las 2 líneas (~36px total) → top ~290px */
 .inv-header-block {
   position: absolute;
-  top: 244px;         /* ← bajado: centrado entre logo y "Pijamada" */
+  top: 244px;
   left: 0; right: 0;
   display: flex;
   flex-direction: column;
@@ -497,34 +620,32 @@ body {
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 13px;
-  color: #1C4753;      /* ← color corregido */
+  color: #1C4753;
   text-align: center;
   line-height: 1.4;
 }
 .inv-hola-line .inv-nombre-invitado {
   font-weight: 900;
-  color: #1C4753;      /* ← color corregido */
+  color: #1C4753;
 }
 .inv-anfitrion-line {
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
   font-size: 13px;
-  color: #1C4753;      /* ← color corregido */
+  color: #1C4753;
   text-align: center;
   line-height: 1.4;
 }
 .inv-anfitrion-line .inv-anfitrion-nombre {
   font-weight: 900;
-  color: #1C4753;      /* ← color corregido */
+  color: #1C4753;
 }
 
-/* ── FIX 2: Bloque info más arriba (menos padding tras "Pijamada"),
-   más angosto y centrado */
 .inv-info-block {
   position: absolute;
-  top: 360px;          /* ← subido: menos espacio muerto bajo "Pijamada" */
-  left: 60px;          /* ← más angosto: más margen lateral */
-  right: 60px;         /* ← simétrico */
+  top: 360px;
+  left: 60px;
+  right: 60px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -555,10 +676,9 @@ body {
   font-style: italic;
 }
 
-/* ── IG Footer: ajustado según nuevo bloque info */
 .inv-ig {
   position: absolute;
-  top: 428px;          /* ← reposicionado acorde */
+  top: 428px;
   left: 0; right: 0;
   display: flex;
   align-items: center;
@@ -592,18 +712,18 @@ body {
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .btn-download {
-  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+  background: var(--notte);
   color: white;
-  box-shadow: 0 6px 24px rgba(149,206,187,0.35);
+  box-shadow: 0 6px 24px rgba(28,71,83,0.28);
 }
 .btn-share {
   background: white;
-  color: var(--teal);
-  border: 1.5px solid rgba(149,206,187,0.22);
+  color: var(--notte);
+  border: 1.5px solid rgba(91,184,176,0.22);
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 .btn-action:hover { transform: translateY(-2px); }
-.btn-download:hover { box-shadow: 0 10px 32px rgba(149,206,187,0.4); }
+.btn-download:hover { box-shadow: 0 10px 32px rgba(28,71,83,0.32); }
 
 /* Toast */
 .toast {
@@ -611,7 +731,7 @@ body {
   bottom: 28px;
   left: 50%;
   transform: translateX(-50%) translateY(80px);
-  background: #2d2d2d;
+  background: var(--notte);
   color: white;
   padding: 12px 24px;
   border-radius: 50px;
@@ -624,7 +744,6 @@ body {
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
 
-/* Overlay cierra dropdowns */
 .overlay {
   position: fixed;
   inset: 0;
@@ -638,20 +757,36 @@ body {
 
 <!-- ══════════════════ PÁGINA 1: FORMULARIO ══════════════════ -->
 <div id="page-form">
-  <div class="form-logo">
-    <img src="https://i.imgur.com/4AMGlsq.png" alt="Trulli Pijamadas" crossorigin="anonymous">
+
+  <!-- Hero con notte -->
+  <div class="form-hero">
+    <div class="form-logo">
+      <img src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/marca.png" alt="Trulli Pijamadas" crossorigin="anonymous">
+    </div>
+    <img
+      class="form-title-img"
+      src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/completa%20tus%20datos.png"
+      alt="Completá tus datos"
+      crossorigin="anonymous"
+    >
   </div>
 
-  <div class="form-card">
-    <p class="form-heading">Generador de invitaciones</p>
-    <h1 class="form-title">Completá los datos</h1>
+  <!-- Ola de transición notte → blanco -->
+  <div class="form-wave">
+    <svg viewBox="0 0 480 36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,0 C120,36 360,36 480,0 L480,0 L0,0 Z" fill="#1C4753"/>
+      <path d="M0,0 C120,36 360,36 480,0 L480,36 L0,36 Z" fill="white"/>
+    </svg>
+  </div>
 
+  <!-- Card de campos -->
+  <div class="form-card">
     <div class="field-group">
 
       <!-- ANFITRIÓN -->
       <div class="field">
         <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
           Anfitrión
         </label>
         <div class="input-wrap">
@@ -659,10 +794,12 @@ body {
         </div>
       </div>
 
+      <div class="field-divider"></div>
+
       <!-- PARA -->
       <div class="field">
         <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
           Invitado
         </label>
         <div class="input-wrap">
@@ -670,10 +807,12 @@ body {
         </div>
       </div>
 
+      <div class="field-divider"></div>
+
       <!-- FECHA -->
       <div class="field">
         <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
           Fecha
         </label>
         <div class="input-wrap" style="position:relative">
@@ -681,7 +820,6 @@ body {
           <button class="input-icon-btn" onclick="toggleCal()" type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
           </button>
-          <!-- Calendar dropdown -->
           <div class="picker-dropdown" id="cal-dropdown">
             <div class="cal-header">
               <button class="cal-nav" onclick="calNav(-1)" type="button">&#8249;</button>
@@ -693,10 +831,12 @@ body {
         </div>
       </div>
 
+      <div class="field-divider"></div>
+
       <!-- HORA -->
       <div class="field">
         <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>
           Hora
         </label>
         <div class="input-wrap" style="position:relative">
@@ -704,7 +844,6 @@ body {
           <button class="input-icon-btn" onclick="toggleTime()" type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>
           </button>
-          <!-- Time dropdown -->
           <div class="picker-dropdown" id="time-dropdown">
             <div class="time-picker">
               <div class="time-col">
@@ -730,14 +869,16 @@ body {
         </div>
       </div>
 
+      <div class="field-divider"></div>
+
       <!-- LUGAR -->
       <div class="field">
         <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
           Lugar
         </label>
         <div class="input-wrap">
-          <input type="text" id="f-lugar" placeholder="Escribí la dirección o buscá en el mapa" style="padding-right:44px">
+          <input type="text" id="f-lugar" placeholder="Dirección o buscá en el mapa" style="padding-right:44px">
           <button class="input-icon-btn" onclick="openMap()" type="button" title="Buscar en mapa">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
           </button>
@@ -745,15 +886,26 @@ body {
       </div>
 
     </div>
+  </div>
 
+  <!-- Botón fuera del card, mismo ancho -->
+  <div class="btn-preview-wrap">
     <button class="btn-preview" onclick="showPreview()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      Vista previa
+      Ver invitación
     </button>
   </div>
+
+  <!-- Paginador decorativo -->
+  <div class="form-footer">
+    <div class="form-footer-dot active"></div>
+    <div class="form-footer-dot"></div>
+    <span class="form-footer-text">Paso 1 de 2</span>
+  </div>
+
 </div>
 
-<!-- Overlay para cerrar dropdowns -->
+<!-- Overlay -->
 <div class="overlay" id="overlay" onclick="closeAll()"></div>
 
 <!-- ══════════════════ MAPA MODAL ══════════════════ -->
@@ -790,19 +942,13 @@ body {
     <div style="width:72px"></div>
   </div>
 
-  <!-- TARJETA -->
   <div id="invitation-card">
-    <!-- Imagen de fondo  -->
-    <img class="inv-bg-img" src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/invitacion.png" alt="">
-
-    <!-- Overlay con texto dinámico -->
+    <img class="inv-bg-img" src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/invitacion.png" alt="" crossorigin="anonymous">
     <div class="inv-overlay">
-
       <div class="inv-header-block">
         <div class="inv-hola-line">Hola <span id="out-para" class="inv-nombre-invitado">Invitado</span> 👋🏻</div>
         <div class="inv-anfitrion-line"><span id="out-anfitrion" class="inv-anfitrion-nombre">Anfitrión</span> te ha invitado a una</div>
       </div>
-
       <div class="inv-info-block">
         <div class="inv-info-row">
           <svg class="inv-info-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
@@ -813,16 +959,13 @@ body {
           <div class="inv-info-text" id="out-lugar">Dirección del evento</div>
         </div>
       </div>
-
       <div class="inv-ig">
         <svg width="9" height="9" viewBox="0 0 24 24" fill="#95CEBB"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
         <span>@trulli.pijamadas</span>
       </div>
-
     </div>
   </div>
 
-  <!-- Botones acción -->
   <div class="action-btns">
     <button class="btn-action btn-download" id="btn-dl" onclick="downloadImage()">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -956,7 +1099,7 @@ function openMap() {
       const customIcon = L.divIcon({
         html: `<div style="
           width:28px;height:28px;
-          background:linear-gradient(135deg,#95CEBB,#6fb8a7);
+          background:linear-gradient(135deg,#5BB8B0,#4AA9A1);
           border-radius:50% 50% 50% 0;
           transform:rotate(-45deg);
           border:2.5px solid white;
@@ -1005,7 +1148,7 @@ function openMap() {
           document.getElementById('map-selected-info').innerHTML = `📍 <span>${formatted}</span>`;
           document.getElementById('map-search').value = formatted;
         } catch(err) {
-          document.getElementById('map-selected-info').innerHTML = `<span style="color:#e07a5f">No se pudo obtener la dirección. Intentá buscarla arriba.</span>`;
+          document.getElementById('map-selected-info').innerHTML = `<span style="color:#e07a5f">No se pudo obtener la dirección.</span>`;
           mapSelectedAddress = '';
         }
       });
@@ -1020,7 +1163,7 @@ function setMapMarker(lat, lng, icon) {
     icon = L.divIcon({
       html: `<div style="
         width:28px;height:28px;
-        background:linear-gradient(135deg,#95CEBB,#6fb8a7);
+        background:linear-gradient(135deg,#5BB8B0,#4AA9A1);
         border-radius:50% 50% 50% 0;
         transform:rotate(-45deg);
         border:2.5px solid white;
@@ -1100,7 +1243,7 @@ function confirmMapAddress() {
 }
 
 // ══════════════════════════════════════
-// CARD UPDATE (live)
+// CARD UPDATE
 // ══════════════════════════════════════
 function updateCard() {
   const para      = document.getElementById('f-para').value.trim();
@@ -1109,11 +1252,8 @@ function updateCard() {
   const hora  = document.getElementById('f-hora').value.trim();
   const lugar = document.getElementById('f-lugar').value.trim();
 
-  const outPara = document.getElementById('out-para');
-  outPara.textContent = para || 'Invitado';
-
-  const outAnfitrion = document.getElementById('out-anfitrion');
-  outAnfitrion.textContent = anfitrion || 'Anfitrión';
+  document.getElementById('out-para').textContent = para || 'Invitado';
+  document.getElementById('out-anfitrion').textContent = anfitrion || 'Anfitrión';
 
   const outFechaHora = document.getElementById('out-fecha-hora');
   let fechaHoraTxt = '';
