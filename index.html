@@ -4,915 +4,327 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trulli Pijamadas — Invitaciones</title>
-
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/favicon%20trulli.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/favicon%20trulli.png">
-
 <meta property="og:title" content="Trulli Pijamadas — Invitaciones">
 <meta property="og:description" content="Creá tu invitación personalizada para la pijamada">
 <meta property="og:image" content="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/TRULLI%20OG.png">
 <meta property="og:url" content="https://trulli.vercel.app">
 <meta property="og:type" content="website">
-
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 <style>
 :root {
-  --acqua:       #5BB8B0;
-  --acqua-mid:   #74C3BC;
-  --acqua-light: #A8D8D4;
-  --acqua-pale:  #D4EDEA;
-  --acqua-ghost: #EAF6F5;
-  --calce:       #FDFBE5;
-  --notte:       #1C4753;
-  --notte-mid:   #2A5F70;
-  --sand:        #D9CFA8;
-  --teal:        var(--acqua);
-  --teal-dark:   #4AA9A1;
-  --teal-light:  var(--acqua-ghost);
-  --cream:       var(--calce);
-  --text:        var(--notte);
-  --text-soft:   #5A8A96;
-  --hero-teal:   #8ECFC9;
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  font-family: 'Nunito', sans-serif;
-  background: #C8E8E5;
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 0 0 60px;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* ══════════════════════ FORM PAGE ══════════════════════ */
-#page-form {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  position: relative;
-  z-index: 1;
-}
-
-/* ── Hero: imagen del recurso PNG ── */
-.form-hero {
-  width: 100%;
-  position: relative;
-  line-height: 0;
-  /* Fondo teal mientras carga la imagen */
-  background: #8ECFC9;
-}
-
-.form-hero-img {
-  width: 100%;
-  display: block;
-  object-fit: cover;
-}
-
-/* ── Card principal: arranca justo bajo el hero ── */
-.form-card {
-  background: white;
-  width: 100%;
-  padding: 32px 28px 28px;
-  box-shadow: 0 4px 40px rgba(28,71,83,0.08);
-  /* borde superior redondeado para solaparse suavemente con el hero */
-  border-radius: 0;
-}
-
-.field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
-
-.field { display: flex; flex-direction: column; gap: 7px; }
-
-.field label {
-  font-weight: 800;
-  font-size: 10.5px;
-  color: var(--notte);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  opacity: 0.75;
-}
-.field label svg { opacity: 1; flex-shrink: 0; color: var(--acqua); }
-
-/* ── Input wrap — z-index elevado para que los dropdowns queden sobre el overlay ── */
-.input-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  z-index: 10; /* los dropdowns hijos heredan este contexto */
-}
-.input-wrap input, .input-wrap textarea {
-  width: 100%;
-  background: var(--calce);
-  border: 1.5px solid rgba(91,184,176,0.25);
-  border-radius: 14px;
-  padding: 13px 18px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--notte);
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  resize: none;
-}
-.input-wrap input:focus, .input-wrap textarea:focus {
-  border-color: var(--acqua);
-  background: white;
-  box-shadow: 0 0 0 3.5px rgba(91,184,176,0.13);
-}
-.input-wrap input::placeholder, .input-wrap textarea::placeholder {
-  color: rgba(91,184,176,0.55);
-  font-weight: 500;
-}
-
-.input-icon-btn {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--acqua);
-  opacity: 0.7;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  transition: opacity 0.15s;
-  z-index: 11;
-}
-.input-icon-btn:hover { opacity: 1; }
-
-.field-divider {
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(to right, transparent, rgba(91,184,176,0.18), transparent);
-}
-
-/* ─── Calendar Picker ─── */
-.picker-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  /* z-index MUY alto: debe quedar por encima del overlay (z=100) */
-  z-index: 300;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 16px 56px rgba(28,71,83,0.16);
-  border: 1.5px solid rgba(91,184,176,0.18);
-  padding: 18px;
-  display: none;
-  min-width: 300px;
-  /* Evitar que el click se propague al overlay */
-  pointer-events: auto;
-}
-.picker-dropdown.open { display: block; }
-
-.cal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-}
-.cal-nav {
-  background: var(--acqua-ghost);
-  border: none;
-  border-radius: 9px;
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  color: var(--notte);
-  font-size: 15px;
-  transition: background 0.15s;
-}
-.cal-nav:hover { background: var(--acqua-pale); }
-.cal-month-label {
-  font-family: 'Comfortaa', cursive;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--notte);
-  letter-spacing: 0.05em;
-}
-.cal-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-}
-.cal-day-name {
-  text-align: center;
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--text-soft);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 4px 0;
-}
-.cal-day {
-  text-align: center;
-  padding: 7px 2px;
-  border-radius: 9px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--notte);
-  transition: background 0.12s, color 0.12s;
-  user-select: none;
-}
-.cal-day:hover { background: var(--acqua-ghost); }
-.cal-day.empty { cursor: default; pointer-events: none; }
-.cal-day.today { font-weight: 900; color: var(--acqua); }
-.cal-day.selected { background: var(--acqua); color: white; font-weight: 800; }
-.cal-day.other-month { color: #c5d8d6; }
-
-/* Time Picker */
-.time-picker {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 0 4px;
-}
-.time-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-.time-label {
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--text-soft);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-.time-spin {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--calce);
-  border: 1.5px solid rgba(91,184,176,0.2);
-  border-radius: 14px;
-  overflow: hidden;
-}
-.time-spin button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--acqua);
-  padding: 6px 18px;
-  font-size: 15px;
-  line-height: 1;
-  transition: background 0.12s;
-  user-select: none;
-}
-.time-spin button:hover { background: var(--acqua-ghost); }
-.time-val {
-  font-family: 'Comfortaa', cursive;
-  font-weight: 700;
-  font-size: 26px;
-  color: var(--notte);
-  padding: 2px 14px;
-  min-width: 62px;
-  text-align: center;
-}
-.time-sep {
-  font-family: 'Pacifico', cursive;
-  font-size: 28px;
-  color: var(--acqua);
-  margin-top: -4px;
-  opacity: 0.7;
-}
-.time-confirm {
-  margin-top: 14px;
-  width: 100%;
-  background: var(--notte);
-  color: white;
-  border: none;
-  border-radius: 11px;
-  padding: 11px;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 13px;
-  cursor: pointer;
-  letter-spacing: 0.06em;
-  transition: background 0.15s;
-}
-.time-confirm:hover { background: var(--notte-mid); }
-
-/* ─── Map picker ─── */
-#map-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 500;
-  background: rgba(28,71,83,0.55);
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-#map-modal.open { display: flex; }
-.map-container {
-  background: white;
-  border-radius: 24px;
-  width: 100%;
-  max-width: 560px;
-  overflow: hidden;
-  box-shadow: 0 20px 80px rgba(28,71,83,0.25);
-}
-.map-header {
-  padding: 18px 22px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(91,184,176,0.15);
-}
-.map-header h3 {
-  font-family: 'Comfortaa', cursive;
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--notte);
-}
-.map-close {
-  background: var(--acqua-ghost);
-  border: none;
-  border-radius: 8px;
-  width: 30px; height: 30px;
-  cursor: pointer;
-  color: var(--notte);
-  font-size: 16px;
-  display: flex; align-items: center; justify-content: center;
-}
-#map-search-wrap {
-  padding: 12px 22px;
-  border-bottom: 1px solid rgba(91,184,176,0.1);
-}
-#map-search {
-  width: 100%;
-  background: var(--calce);
-  border: 1.5px solid rgba(91,184,176,0.22);
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--notte);
-  outline: none;
-}
-#map-search:focus { border-color: var(--acqua); }
-#map-suggestions {
-  list-style: none;
-  margin-top: 6px;
-  max-height: 160px;
-  overflow-y: auto;
-  border-radius: 10px;
-  border: 1px solid rgba(91,184,176,0.15);
-  display: none;
-}
-#map-suggestions li {
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--notte);
-  cursor: pointer;
-  border-bottom: 1px solid rgba(91,184,176,0.08);
-  transition: background 0.12s;
-}
-#map-suggestions li:hover { background: var(--acqua-ghost); }
-#map-suggestions li:last-child { border-bottom: none; }
-#map-suggestions.open { display: block; }
-#map-frame-wrap { height: 280px; position: relative; background: #e8f0f0; }
-#leaflet-map { width: 100%; height: 100%; }
-#map-click-hint {
-  padding: 6px 22px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--acqua);
-  background: rgba(91,184,176,0.08);
-  border-bottom: 1px solid rgba(91,184,176,0.1);
-  text-align: center;
-  letter-spacing: 0.02em;
-}
-#map-selected-info {
-  padding: 7px 22px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--notte);
-  min-height: 30px;
-  border-bottom: 1px solid rgba(91,184,176,0.1);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-#map-selected-info:empty { display: none; }
-.map-confirm-btn {
-  margin: 14px 22px 18px;
-  width: calc(100% - 44px);
-  background: var(--notte);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 13px;
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background 0.15s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.map-confirm-btn:hover { background: var(--notte-mid); }
-
-/* ══ BTN PREVIEW ══ */
-.btn-preview-wrap {
-  padding: 24px 28px 32px;
-  background: white;
-  width: 100%;
-}
-.btn-preview {
-  width: 100%;
-  background: var(--notte);
-  color: white;
-  border: none;
-  border-radius: 16px;
-  padding: 17px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  box-shadow: 0 8px 28px rgba(28,71,83,0.22);
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
-  position: relative;
-  overflow: hidden;
-}
-.btn-preview::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(91,184,176,0.18) 0%, transparent 60%);
-  pointer-events: none;
-}
-.btn-preview:hover {
-  background: var(--notte-mid);
-  transform: translateY(-2px);
-  box-shadow: 0 14px 36px rgba(28,71,83,0.28);
-}
-
-/* ── Pie del formulario ── */
-.form-footer {
-  background: white;
-  width: 100%;
-  padding: 0 28px 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-.form-footer-dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--acqua-light);
-}
-.form-footer-dot.active { background: var(--acqua); width: 18px; border-radius: 3px; }
-.form-footer-text {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--acqua-light);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-left: 8px;
-}
-
-/* ══════════════════════ OVERLAY ══════════════════════
-   z-index=200 para quedar POR DEBAJO de los dropdowns (z=300)
-   pero por encima del resto del contenido (z=1).
-   Esto evita que "robe" los clicks dentro del picker.
-*/
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  display: none;
-  background: transparent;
-}
-.overlay.open { display: block; }
-
-/* ══════════════════════ PREVIEW PAGE ══════════════════════ */
-#page-preview {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 580px;
-  gap: 18px;
-  padding: 28px 16px 48px;
-  position: relative;
-  z-index: 1;
-}
-.preview-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-.btn-back {
-  background: white;
-  border: 1.5px solid rgba(91,184,176,0.22);
-  border-radius: 12px;
-  padding: 10px 18px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--notte);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background 0.15s;
-}
-.btn-back:hover { background: var(--acqua-ghost); }
-.preview-label {
-  font-family: 'Comfortaa', cursive;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--acqua);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-/* ═══ TARJETA INVITACIÓN ═══ */
-#invitation-card {
-  width: 360px;
-  height: 640px;
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-  border-radius: 18px;
-  box-shadow: 0 20px 72px rgba(0,0,0,0.22);
-}
-
-.inv-bg-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-  display: block;
-}
-
-.inv-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
-}
-
-.inv-header-block {
-  position: absolute;
-  top: 244px;
-  left: 0; right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 0 40px;
-}
-.inv-hola-line {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  color: #1C4753;
-  text-align: center;
-  line-height: 1.4;
-}
-.inv-hola-line .inv-nombre-invitado {
-  font-weight: 900;
-  color: #1C4753;
-}
-.inv-anfitrion-line {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  color: #1C4753;
-  text-align: center;
-  line-height: 1.4;
-}
-.inv-anfitrion-line .inv-anfitrion-nombre {
-  font-weight: 900;
-  color: #1C4753;
-}
-
-.inv-info-block {
-  position: absolute;
-  top: 360px;
-  left: 60px;
-  right: 60px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  background: rgba(149,206,187,0.10);
-  border-radius: 10px;
-  border: 1px solid rgba(149,206,187,0.22);
-  overflow: hidden;
-}
-.inv-info-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 11px;
-  border-bottom: 1px solid rgba(149,206,187,0.13);
-}
-.inv-info-row:last-child { border-bottom: none; }
-.inv-info-icon { color: #95CEBB; opacity: 0.75; flex-shrink: 0; }
-.inv-info-text {
-  font-family: 'Nunito', sans-serif;
-  font-size: 11px;
-  font-weight: 700;
-  color: #1C4753;
-  line-height: 1.3;
-}
-.inv-info-text.empty {
-  color: rgba(100,160,148,0.5);
-  font-weight: 500;
-  font-style: italic;
-}
-
-.inv-ig {
-  position: absolute;
-  top: 428px;
-  left: 0; right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  color: #95CEBB;
-  opacity: 0.9;
-}
-.inv-ig span {
-  font-family: 'Nunito', sans-serif;
-  font-weight: 700;
-  font-size: 9px;
-  letter-spacing: 0.05em;
-}
-
-/* ══ Action buttons ══ */
-.action-btns { display: flex; gap: 12px; width: 100%; }
-.btn-action {
-  flex: 1;
-  border: none;
-  border-radius: 16px;
-  padding: 15px 12px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.btn-download {
-  background: var(--notte);
-  color: white;
-  box-shadow: 0 6px 24px rgba(28,71,83,0.28);
-}
-.btn-share {
-  background: white;
-  color: var(--notte);
-  border: 1.5px solid rgba(91,184,176,0.22);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-}
-.btn-action:hover { transform: translateY(-2px); }
-.btn-download:hover { box-shadow: 0 10px 32px rgba(28,71,83,0.32); }
-
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: var(--notte);
-  color: white;
-  padding: 12px 24px;
-  border-radius: 50px;
-  font-size: 14px;
-  font-weight: 600;
-  transition: transform 0.3s ease;
-  z-index: 999;
-  white-space: nowrap;
-  pointer-events: none;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
+  --acqua:#5BB8B0;--acqua-mid:#74C3BC;--acqua-light:#A8D8D4;
+  --acqua-pale:#D4EDEA;--acqua-ghost:#EAF6F5;
+  --calce:#FDFBE5;--notte:#1C4753;--notte-mid:#2A5F70;
+  --bg:#AACFCC;--text-soft:#5A8A96;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  min-height:100vh;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:0 0 60px;overflow-x:hidden;
+}
+#page-form{
+  width:100%;max-width:480px;
+  display:flex;flex-direction:column;align-items:center;
+}
+.form-hero{width:100%;line-height:0;background:transparent;}
+.form-hero-img{width:100%;display:block;}
+.form-fields{width:100%;padding:8px 24px 0;display:flex;flex-direction:column;}
+.field-group{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{
+  font-weight:800;font-size:10px;color:var(--notte);
+  letter-spacing:.18em;text-transform:uppercase;
+  display:flex;align-items:center;gap:6px;opacity:.7;padding-left:2px;
+}
+.field label svg{color:var(--notte);opacity:.8;flex-shrink:0;}
+.input-wrap{position:relative;display:flex;align-items:center;}
+.input-wrap input{
+  width:100%;
+  background:rgba(255,255,255,0.55);
+  border:1.5px solid rgba(255,255,255,0.7);
+  border-radius:16px;padding:14px 18px;
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:var(--notte);
+  outline:none;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  box-shadow:0 2px 12px rgba(28,71,83,.08);
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.input-wrap input:focus{
+  border-color:rgba(255,255,255,.9);background:rgba(255,255,255,.72);
+  box-shadow:0 0 0 3px rgba(255,255,255,.3),0 2px 12px rgba(28,71,83,.1);
+}
+.input-wrap input::placeholder{color:rgba(28,71,83,.4);font-weight:500;}
+.input-icon-btn{
+  position:absolute;right:13px;background:none;border:none;cursor:pointer;
+  color:var(--notte);opacity:.45;padding:4px;display:flex;align-items:center;
+  transition:opacity .15s;z-index:1;
+}
+.input-icon-btn:hover{opacity:.75;}
+/* DROPDOWNS: position fixed, posicionados via JS */
+.picker-dropdown{
+  position:fixed;z-index:1000;
+  background:white;border-radius:20px;
+  box-shadow:0 16px 56px rgba(28,71,83,.22);
+  border:1.5px solid rgba(91,184,176,.2);
+  padding:18px;display:none;width:300px;
+}
+.picker-dropdown.open{display:block;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-nav{
+  background:var(--acqua-ghost);border:none;border-radius:9px;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--notte);font-size:15px;transition:background .15s;
+}
+.cal-nav:hover{background:var(--acqua-pale);}
+.cal-month-label{font-family:'Comfortaa',cursive;font-weight:700;font-size:13px;color:var(--notte);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-day-name{
+  text-align:center;font-size:10px;font-weight:800;color:var(--text-soft);
+  letter-spacing:.05em;text-transform:uppercase;padding:4px 0;
+}
+.cal-day{
+  text-align:center;padding:8px 2px;border-radius:9px;
+  font-size:13px;font-weight:600;cursor:pointer;color:var(--notte);
+  transition:background .12s,color .12s;
+  user-select:none;-webkit-user-select:none;
+}
+.cal-day:not(.empty):hover{background:var(--acqua-ghost);}
+.cal-day.empty{cursor:default;pointer-events:none;}
+.cal-day.today{font-weight:900;color:var(--acqua);}
+.cal-day.selected{background:var(--acqua);color:white!important;font-weight:800;}
+.time-picker{display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 0 4px;}
+.time-col{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.time-label{font-size:10px;font-weight:800;color:var(--text-soft);letter-spacing:.1em;text-transform:uppercase;}
+.time-spin{
+  display:flex;flex-direction:column;align-items:center;
+  background:#f5faf9;border:1.5px solid rgba(91,184,176,.2);
+  border-radius:14px;overflow:hidden;
+}
+.time-spin button{
+  background:none;border:none;cursor:pointer;color:var(--acqua);
+  padding:8px 20px;font-size:14px;line-height:1;transition:background .12s;user-select:none;
+}
+.time-spin button:hover{background:var(--acqua-ghost);}
+.time-val{
+  font-family:'Comfortaa',cursive;font-weight:700;font-size:26px;
+  color:var(--notte);padding:2px 14px;min-width:64px;text-align:center;
+}
+.time-sep{font-family:'Pacifico',cursive;font-size:28px;color:var(--acqua);margin-top:-4px;opacity:.7;}
+.time-confirm{
+  margin-top:14px;width:100%;background:var(--notte);color:white;
+  border:none;border-radius:11px;padding:12px;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;
+  cursor:pointer;letter-spacing:.06em;transition:background .15s;
+}
+.time-confirm:hover{background:var(--notte-mid);}
+.overlay{position:fixed;inset:0;z-index:999;display:none;background:transparent;}
+.overlay.open{display:block;}
+.btn-preview-wrap{width:100%;padding:8px 24px 28px;}
+.btn-preview{
+  width:100%;background:var(--notte);color:white;border:none;border-radius:18px;padding:17px;
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;letter-spacing:.06em;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  box-shadow:0 8px 28px rgba(28,71,83,.28);transition:transform .15s,box-shadow .15s,background .15s;
+}
+.btn-preview:hover{background:var(--notte-mid);transform:translateY(-2px);box-shadow:0 14px 36px rgba(28,71,83,.32);}
+.form-footer{
+  width:100%;padding:0 24px 32px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.form-footer-dot{width:5px;height:5px;border-radius:50%;background:rgba(28,71,83,.25);}
+.form-footer-dot.active{background:var(--notte);width:18px;border-radius:3px;opacity:.6;}
+.form-footer-text{font-size:11px;font-weight:700;color:var(--notte);letter-spacing:.08em;text-transform:uppercase;margin-left:8px;opacity:.4;}
+/* MAP */
+#map-modal{display:none;position:fixed;inset:0;z-index:1500;background:rgba(28,71,83,.55);align-items:center;justify-content:center;padding:20px;}
+#map-modal.open{display:flex;}
+.map-container{background:white;border-radius:24px;width:100%;max-width:560px;overflow:hidden;box-shadow:0 20px 80px rgba(28,71,83,.25);}
+.map-header{padding:18px 22px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(91,184,176,.15);}
+.map-header h3{font-family:'Comfortaa',cursive;font-weight:700;font-size:15px;color:var(--notte);}
+.map-close{background:var(--acqua-ghost);border:none;border-radius:8px;width:30px;height:30px;cursor:pointer;color:var(--notte);font-size:16px;display:flex;align-items:center;justify-content:center;}
+#map-search-wrap{padding:12px 22px;border-bottom:1px solid rgba(91,184,176,.1);}
+#map-search{width:100%;background:#f8faf9;border:1.5px solid rgba(91,184,176,.22);border-radius:10px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;color:var(--notte);outline:none;}
+#map-search:focus{border-color:var(--acqua);}
+#map-suggestions{list-style:none;margin-top:6px;max-height:160px;overflow-y:auto;border-radius:10px;border:1px solid rgba(91,184,176,.15);display:none;}
+#map-suggestions li{padding:10px 14px;font-size:13px;font-weight:600;color:var(--notte);cursor:pointer;border-bottom:1px solid rgba(91,184,176,.08);transition:background .12s;}
+#map-suggestions li:hover{background:var(--acqua-ghost);}
+#map-suggestions li:last-child{border-bottom:none;}
+#map-suggestions.open{display:block;}
+#map-frame-wrap{height:280px;background:#e8f0f0;}
+#leaflet-map{width:100%;height:100%;}
+#map-click-hint{padding:6px 22px;font-size:11px;font-weight:600;color:var(--acqua);background:rgba(91,184,176,.08);border-bottom:1px solid rgba(91,184,176,.1);text-align:center;}
+#map-selected-info{padding:7px 22px;font-size:12px;font-weight:700;color:var(--notte);min-height:30px;border-bottom:1px solid rgba(91,184,176,.1);display:flex;align-items:center;gap:6px;}
+.map-confirm-btn{margin:14px 22px 18px;width:calc(100% - 44px);background:var(--notte);color:white;border:none;border-radius:12px;padding:13px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;}
+.map-confirm-btn:hover{background:var(--notte-mid);}
+/* PREVIEW */
+#page-preview{display:none;flex-direction:column;align-items:center;width:100%;max-width:580px;gap:18px;padding:28px 16px 48px;}
+.preview-topbar{display:flex;align-items:center;justify-content:space-between;width:100%;}
+.btn-back{background:white;border:1.5px solid rgba(91,184,176,.22);border-radius:12px;padding:10px 18px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--notte);cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s;}
+.btn-back:hover{background:var(--acqua-ghost);}
+.preview-label{font-family:'Comfortaa',cursive;font-size:11px;font-weight:700;color:var(--acqua);letter-spacing:.16em;text-transform:uppercase;opacity:.7;}
+#invitation-card{width:360px;height:640px;flex-shrink:0;position:relative;overflow:hidden;border-radius:18px;box-shadow:0 20px 72px rgba(0,0,0,.22);}
+.inv-bg-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;}
+.inv-overlay{position:absolute;inset:0;z-index:10;pointer-events:none;}
+.inv-header-block{position:absolute;top:244px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 40px;}
+.inv-hola-line{font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1C4753;text-align:center;line-height:1.4;}
+.inv-hola-line .inv-nombre-invitado{font-weight:900;}
+.inv-anfitrion-line{font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:#1C4753;text-align:center;line-height:1.4;}
+.inv-anfitrion-line .inv-anfitrion-nombre{font-weight:900;}
+.inv-info-block{position:absolute;top:360px;left:60px;right:60px;display:flex;flex-direction:column;background:rgba(149,206,187,.10);border-radius:10px;border:1px solid rgba(149,206,187,.22);overflow:hidden;}
+.inv-info-row{display:flex;align-items:center;gap:8px;padding:7px 11px;border-bottom:1px solid rgba(149,206,187,.13);}
+.inv-info-row:last-child{border-bottom:none;}
+.inv-info-icon{color:#95CEBB;opacity:.75;flex-shrink:0;}
+.inv-info-text{font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:#1C4753;line-height:1.3;}
+.inv-info-text.empty{color:rgba(100,160,148,.5);font-weight:500;font-style:italic;}
+.inv-ig{position:absolute;top:428px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:4px;color:#95CEBB;opacity:.9;}
+.inv-ig span{font-family:'Nunito',sans-serif;font-weight:700;font-size:9px;letter-spacing:.05em;}
+.action-btns{display:flex;gap:12px;width:100%;}
+.btn-action{flex:1;border:none;border-radius:16px;padding:15px 12px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;}
+.btn-download{background:var(--notte);color:white;box-shadow:0 6px 24px rgba(28,71,83,.28);}
+.btn-share{background:white;color:var(--notte);border:1.5px solid rgba(91,184,176,.22);}
+.btn-action:hover{transform:translateY(-2px);}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--notte);color:white;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:600;transition:transform .3s ease;z-index:9999;white-space:nowrap;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 
-<!-- ══════════════════ PÁGINA 1: FORMULARIO ══════════════════ -->
 <div id="page-form">
-
-  <!-- Hero: recurso PNG completo -->
   <div class="form-hero">
-    <img
-      class="form-hero-img"
-      src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/Recurso%205.png"
-      alt="Completá los datos — Trulli Pijamadas"
-      crossorigin="anonymous"
-    >
+    <img class="form-hero-img" src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/Recurso%205.png" alt="Completá los datos" crossorigin="anonymous">
   </div>
-
-  <!-- Card de campos: inmediatamente bajo el hero, sin ola intermedia -->
-  <div class="form-card">
+  <div class="form-fields">
     <div class="field-group">
-
-      <!-- ANFITRIÓN -->
       <div class="field">
-        <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
-          Anfitrión
-        </label>
+        <label><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>Anfitrión</label>
         <div class="input-wrap">
-          <input type="text" id="f-anfitrion" placeholder="Nombre de quien invita">
+          <input type="text" id="f-anfitrion" placeholder="Nombre de quien invita" autocomplete="off">
         </div>
       </div>
-
-      <div class="field-divider"></div>
-
-      <!-- PARA -->
       <div class="field">
-        <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-          Invitado
-        </label>
+        <label><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>Invitado</label>
         <div class="input-wrap">
-          <input type="text" id="f-para" placeholder="Nombre del invitado/a">
+          <input type="text" id="f-para" placeholder="Nombre del invitado/a" autocomplete="off">
         </div>
       </div>
-
-      <div class="field-divider"></div>
-
-      <!-- FECHA -->
       <div class="field">
-        <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
-          Fecha
-        </label>
-        <div class="input-wrap" style="position:relative">
-          <input type="text" id="f-fecha" placeholder="Seleccioná una fecha" readonly style="cursor:pointer; padding-right: 44px;" onclick="toggleCal(event)">
-          <button class="input-icon-btn" onclick="toggleCal(event)" type="button">
+        <label><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>Fecha</label>
+        <div class="input-wrap" id="wrap-fecha">
+          <input type="text" id="f-fecha" placeholder="Seleccioná una fecha" readonly style="cursor:pointer;padding-right:44px">
+          <button class="input-icon-btn" type="button" tabindex="-1" id="btn-open-cal">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
           </button>
-          <!-- El dropdown va DENTRO del input-wrap para heredar z-index:10 -->
-          <div class="picker-dropdown" id="cal-dropdown" onclick="event.stopPropagation()">
-            <div class="cal-header">
-              <button class="cal-nav" onclick="calNav(-1)" type="button">&#8249;</button>
-              <span class="cal-month-label" id="cal-month-label"></span>
-              <button class="cal-nav" onclick="calNav(1)" type="button">&#8250;</button>
-            </div>
-            <div class="cal-grid" id="cal-grid"></div>
-          </div>
         </div>
       </div>
-
-      <div class="field-divider"></div>
-
-      <!-- HORA -->
       <div class="field">
-        <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>
-          Hora
-        </label>
-        <div class="input-wrap" style="position:relative">
-          <input type="text" id="f-hora" placeholder="Seleccioná la hora" readonly style="cursor:pointer; padding-right:44px;" onclick="toggleTime(event)">
-          <button class="input-icon-btn" onclick="toggleTime(event)" type="button">
+        <label><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>Hora</label>
+        <div class="input-wrap" id="wrap-hora">
+          <input type="text" id="f-hora" placeholder="Seleccioná la hora" readonly style="cursor:pointer;padding-right:44px">
+          <button class="input-icon-btn" type="button" tabindex="-1" id="btn-open-time">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>
           </button>
-          <div class="picker-dropdown" id="time-dropdown" onclick="event.stopPropagation()">
-            <div class="time-picker">
-              <div class="time-col">
-                <span class="time-label">Hora</span>
-                <div class="time-spin">
-                  <button onclick="spinTime('h',1)" type="button">▲</button>
-                  <div class="time-val" id="t-h">18</div>
-                  <button onclick="spinTime('h',-1)" type="button">▼</button>
-                </div>
-              </div>
-              <span class="time-sep">:</span>
-              <div class="time-col">
-                <span class="time-label">Min</span>
-                <div class="time-spin">
-                  <button onclick="spinTime('m',1)" type="button">▲</button>
-                  <div class="time-val" id="t-m">00</div>
-                  <button onclick="spinTime('m',-1)" type="button">▼</button>
-                </div>
-              </div>
-            </div>
-            <button class="time-confirm" onclick="confirmTime()" type="button">Confirmar</button>
-          </div>
         </div>
       </div>
-
-      <div class="field-divider"></div>
-
-      <!-- LUGAR -->
       <div class="field">
-        <label>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="color:var(--acqua)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-          Lugar
-        </label>
+        <label><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Lugar</label>
         <div class="input-wrap">
-          <input type="text" id="f-lugar" placeholder="Dirección o buscá en el mapa" style="padding-right:44px">
-          <button class="input-icon-btn" onclick="openMap()" type="button" title="Buscar en mapa">
+          <input type="text" id="f-lugar" placeholder="Dirección o buscá en el mapa" style="padding-right:44px" autocomplete="off">
+          <button class="input-icon-btn" type="button" tabindex="-1" id="btn-open-map">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>
           </button>
         </div>
       </div>
-
     </div>
   </div>
-
-  <!-- Botón Ver invitación -->
   <div class="btn-preview-wrap">
-    <button class="btn-preview" onclick="showPreview()">
+    <button class="btn-preview" id="btn-preview">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       Ver invitación
     </button>
   </div>
-
-  <!-- Paginador decorativo -->
   <div class="form-footer">
     <div class="form-footer-dot active"></div>
     <div class="form-footer-dot"></div>
     <span class="form-footer-text">Paso 1 de 2</span>
   </div>
-
 </div>
 
-<!--
-  OVERLAY: z-index 200 → por debajo de los dropdowns (z=300)
-  El click en el overlay cierra los pickers SIN interferir con clicks dentro del picker,
-  ya que los dropdowns tienen z-index mayor y stopPropagation().
--->
-<div class="overlay" id="overlay" onclick="closeAll()"></div>
+<!-- Dropdowns fuera del form para evitar clipping -->
+<div class="picker-dropdown" id="cal-dropdown">
+  <div class="cal-header">
+    <button class="cal-nav" id="cal-prev" type="button">&#8249;</button>
+    <span class="cal-month-label" id="cal-month-label"></span>
+    <button class="cal-nav" id="cal-next" type="button">&#8250;</button>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
 
-<!-- ══════════════════ MAPA MODAL ══════════════════ -->
+<div class="picker-dropdown" id="time-dropdown">
+  <div class="time-picker">
+    <div class="time-col">
+      <span class="time-label">Hora</span>
+      <div class="time-spin">
+        <button id="h-up" type="button">&#9650;</button>
+        <div class="time-val" id="t-h">18</div>
+        <button id="h-dn" type="button">&#9660;</button>
+      </div>
+    </div>
+    <span class="time-sep">:</span>
+    <div class="time-col">
+      <span class="time-label">Min</span>
+      <div class="time-spin">
+        <button id="m-up" type="button">&#9650;</button>
+        <div class="time-val" id="t-m">00</div>
+        <button id="m-dn" type="button">&#9660;</button>
+      </div>
+    </div>
+  </div>
+  <button class="time-confirm" id="time-confirm-btn" type="button">Confirmar</button>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
 <div id="map-modal">
   <div class="map-container">
     <div class="map-header">
       <h3>Seleccioná el lugar</h3>
-      <button class="map-close" onclick="closeMap()">✕</button>
+      <button class="map-close" id="btn-close-map">&#x2715;</button>
     </div>
     <div id="map-search-wrap">
-      <input id="map-search" type="text" placeholder="Buscar cualquier dirección..." oninput="searchAddress(this.value)">
+      <input id="map-search" type="text" placeholder="Buscar cualquier dirección...">
       <ul id="map-suggestions"></ul>
     </div>
-    <div id="map-click-hint">📍 Hacé click en el mapa para marcar el lugar exacto</div>
-    <div id="map-frame-wrap">
-      <div id="leaflet-map"></div>
-    </div>
+    <div id="map-click-hint">&#128205; Hacé click en el mapa para marcar el lugar exacto</div>
+    <div id="map-frame-wrap"><div id="leaflet-map"></div></div>
     <div id="map-selected-info"></div>
-    <button class="map-confirm-btn" onclick="confirmMapAddress()">
+    <button class="map-confirm-btn" id="btn-confirm-map">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
       Confirmar dirección
     </button>
   </div>
 </div>
 
-<!-- ══════════════════ PÁGINA 2: PREVIEW ══════════════════ -->
 <div id="page-preview">
   <div class="preview-topbar">
-    <button class="btn-back" onclick="showForm()">
+    <button class="btn-back" id="btn-back">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       Editar
     </button>
     <span class="preview-label">Vista previa</span>
     <div style="width:72px"></div>
   </div>
-
   <div id="invitation-card">
     <img class="inv-bg-img" src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/invitacion.png" alt="" crossorigin="anonymous">
     <div class="inv-overlay">
       <div class="inv-header-block">
-        <div class="inv-hola-line">Hola <span id="out-para" class="inv-nombre-invitado">Invitado</span> 👋🏻</div>
+        <div class="inv-hola-line">Hola <span id="out-para" class="inv-nombre-invitado">Invitado</span> &#128075;&#127995;</div>
         <div class="inv-anfitrion-line"><span id="out-anfitrion" class="inv-anfitrion-nombre">Anfitrión</span> te ha invitado a una</div>
       </div>
       <div class="inv-info-block">
@@ -931,13 +343,12 @@ body {
       </div>
     </div>
   </div>
-
   <div class="action-btns">
-    <button class="btn-action btn-download" id="btn-dl" onclick="downloadImage()">
+    <button class="btn-action btn-download" id="btn-dl">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Descargar
     </button>
-    <button class="btn-action btn-share" onclick="shareImage()">
+    <button class="btn-action btn-share" id="btn-share">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       Compartir
     </button>
@@ -947,381 +358,218 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
-// ══════════════════════════════════════
-// CALENDAR
-// ══════════════════════════════════════
-const DIAS = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
-const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const MESES_LARGO = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-const DIAS_LARGO = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-
-let calDate = new Date();
-let calSelected = null;
-
-function toggleCal(e) {
-  if (e) e.stopPropagation();
-  const dd = document.getElementById('cal-dropdown');
-  const td = document.getElementById('time-dropdown');
-  td.classList.remove('open');
-  const isOpen = dd.classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('open', isOpen);
-  if (isOpen) renderCal();
+// ─── Helpers ───────────────────────────────────────────────
+function positionDropdown(ddId, anchorId) {
+  var anchor = document.getElementById(anchorId);
+  var dd = document.getElementById(ddId);
+  var rect = anchor.getBoundingClientRect();
+  dd.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+  dd.style.left = rect.left + 'px';
+  var w = dd.offsetWidth || 300;
+  if (rect.left + w > window.innerWidth - 8)
+    dd.style.left = Math.max(8, window.innerWidth - w - 8) + 'px';
 }
 
-function calNav(dir) {
-  calDate = new Date(calDate.getFullYear(), calDate.getMonth() + dir, 1);
-  renderCal();
-}
-
-function renderCal() {
-  const y = calDate.getFullYear(), m = calDate.getMonth();
-  document.getElementById('cal-month-label').textContent = MESES[m] + ' ' + y;
-  const grid = document.getElementById('cal-grid');
-  grid.innerHTML = '';
-  DIAS.forEach(d => {
-    const el = document.createElement('div');
-    el.className = 'cal-day-name';
-    el.textContent = d;
-    grid.appendChild(el);
-  });
-  const first = new Date(y, m, 1).getDay();
-  const days = new Date(y, m+1, 0).getDate();
-  const today = new Date();
-  for (let i = 0; i < first; i++) {
-    const el = document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el);
-  }
-  for (let d = 1; d <= days; d++) {
-    const el = document.createElement('div');
-    el.className = 'cal-day';
-    el.textContent = d;
-    if (today.getDate()===d && today.getMonth()===m && today.getFullYear()===y) el.classList.add('today');
-    if (calSelected && calSelected.getDate()===d && calSelected.getMonth()===m && calSelected.getFullYear()===y) el.classList.add('selected');
-    el.addEventListener('click', function(ev) {
-      ev.stopPropagation();
-      selectDay(y, m, d);
-    });
-    grid.appendChild(el);
-  }
-}
-
-function selectDay(y, m, d) {
-  calSelected = new Date(y, m, d);
-  const diaNombre = DIAS_LARGO[calSelected.getDay()];
-  const diaCap = diaNombre.charAt(0).toUpperCase() + diaNombre.slice(1);
-  const mesNombre = MESES_LARGO[m];
-  const mesNombreCap = mesNombre.charAt(0).toUpperCase() + mesNombre.slice(1);
-  document.getElementById('f-fecha').value = `${diaCap} ${d} de ${mesNombreCap}`;
-  closeAll();
-  updateCard();
-}
-
-// ══════════════════════════════════════
-// TIME PICKER
-// ══════════════════════════════════════
-let tH = 18, tM = 0;
-
-function toggleTime(e) {
-  if (e) e.stopPropagation();
-  const dd = document.getElementById('time-dropdown');
-  const cd = document.getElementById('cal-dropdown');
-  cd.classList.remove('open');
-  const isOpen = dd.classList.toggle('open');
-  document.getElementById('overlay').classList.toggle('open', isOpen);
-}
-
-function spinTime(part, dir) {
-  if (part === 'h') { tH = (tH + dir + 24) % 24; document.getElementById('t-h').textContent = String(tH).padStart(2,'0'); }
-  else { tM = (tM + dir*15 + 60) % 60; document.getElementById('t-m').textContent = String(tM).padStart(2,'0'); }
-}
-
-function confirmTime() {
-  document.getElementById('f-hora').value = String(tH).padStart(2,'0') + ':' + String(tM).padStart(2,'0') + ' hs';
-  closeAll();
-  updateCard();
-}
+var overlay = document.getElementById('overlay');
+var calDd   = document.getElementById('cal-dropdown');
+var timeDd  = document.getElementById('time-dropdown');
 
 function closeAll() {
-  document.getElementById('cal-dropdown').classList.remove('open');
-  document.getElementById('time-dropdown').classList.remove('open');
-  document.getElementById('overlay').classList.remove('open');
+  calDd.classList.remove('open');
+  timeDd.classList.remove('open');
+  overlay.classList.remove('open');
 }
+overlay.addEventListener('click', closeAll);
+// No propagar clicks dentro de los dropdowns al overlay
+calDd.addEventListener('click',  function(e){ e.stopPropagation(); });
+timeDd.addEventListener('click', function(e){ e.stopPropagation(); });
 
-// ══════════════════════════════════════
-// MAP — Leaflet + Nominatim
-// ══════════════════════════════════════
-let mapSelectedAddress = '';
-let mapSelectedLat = null;
-let mapSelectedLon = null;
-let searchTimeout = null;
-let leafletMap = null;
-let leafletMarker = null;
+// ─── Calendar ─────────────────────────────────────────────
+var DIAS      = ['Do','Lu','Ma','Mi','Ju','Vi','Sa'];
+var MESES     = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+var MESLARG   = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+var DIALARG   = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+var calDate   = new Date();
+var calSel    = null;
 
-function openMap() {
-  document.getElementById('map-modal').classList.add('open');
-  setTimeout(() => {
-    if (!leafletMap) {
-      leafletMap = L.map('leaflet-map').setView([-31.5375, -68.5364], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-        maxZoom: 19
-      }).addTo(leafletMap);
-
-      const customIcon = L.divIcon({
-        html: `<div style="
-          width:28px;height:28px;
-          background:linear-gradient(135deg,#5BB8B0,#4AA9A1);
-          border-radius:50% 50% 50% 0;
-          transform:rotate(-45deg);
-          border:2.5px solid white;
-          box-shadow:0 3px 10px rgba(0,0,0,0.25);
-        "></div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-        className: ''
-      });
-
-      leafletMap.on('click', async (e) => {
-        const { lat, lng } = e.latlng;
-        setMapMarker(lat, lng, customIcon);
-        document.getElementById('map-selected-info').innerHTML = `<span style="color:#aaa;font-style:italic">Buscando dirección...</span>`;
-        try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=es`, {
-            headers: { 'User-Agent': 'TrulliPijamadas/1.0 (invitaciones@trulli.com.ar)', 'Accept-Language': 'es' }
-          });
-          const data = await res.json();
-          const addr = data.address || {};
-          let street = addr.road || addr.pedestrian || addr.footway || addr.path || '';
-          let number = addr.house_number || '';
-          let orientation = '';
-          if (number) {
-            const match = number.match(/^(\d+)\s*\(?([ONESones])\)?/);
-            if (match) { number = match[1]; orientation = ' (' + match[2].toUpperCase() + ')'; }
-          }
-          const suburbRaw = addr.suburb || addr.quarter || addr.neighbourhood || '';
-          const orientMatch = suburbRaw.match(/\b([Nn]orte|[Ss]ur|[Ee]ste|[Oo]este)\b/i);
-          if (!orientation && orientMatch) {
-            const map = { norte:'N', sur:'S', este:'E', oeste:'O' };
-            orientation = ' (' + (map[orientMatch[1].toLowerCase()] || orientMatch[1][0].toUpperCase()) + ')';
-          }
-          const city = addr.city || addr.town || addr.village || addr.county || addr.state_district || '';
-          let parts = [];
-          if (street) {
-            let streetPart = street;
-            if (number) streetPart += ' ' + number + orientation;
-            parts.push(streetPart);
-          }
-          if (city) parts.push(city);
-          const formatted = parts.length ? parts.join(', ') : data.display_name.split(',').slice(0,3).join(', ');
-          mapSelectedAddress = formatted;
-          mapSelectedLat = lat;
-          mapSelectedLon = lng;
-          document.getElementById('map-selected-info').innerHTML = `📍 <span>${formatted}</span>`;
-          document.getElementById('map-search').value = formatted;
-        } catch(err) {
-          document.getElementById('map-selected-info').innerHTML = `<span style="color:#e07a5f">No se pudo obtener la dirección.</span>`;
-          mapSelectedAddress = '';
-        }
-      });
-    } else {
-      leafletMap.invalidateSize();
-    }
-  }, 150);
-}
-
-function setMapMarker(lat, lng, icon) {
-  if (!icon) {
-    icon = L.divIcon({
-      html: `<div style="
-        width:28px;height:28px;
-        background:linear-gradient(135deg,#5BB8B0,#4AA9A1);
-        border-radius:50% 50% 50% 0;
-        transform:rotate(-45deg);
-        border:2.5px solid white;
-        box-shadow:0 3px 10px rgba(0,0,0,0.25);
-      "></div>`,
-      iconSize: [28, 28],
-      iconAnchor: [14, 28],
-      className: ''
-    });
+function openCal() {
+  var isOpen = calDd.classList.contains('open');
+  closeAll();
+  if (!isOpen) {
+    renderCal();
+    positionDropdown('cal-dropdown','wrap-fecha');
+    calDd.classList.add('open');
+    overlay.classList.add('open');
   }
-  if (leafletMarker) leafletMap.removeLayer(leafletMarker);
-  leafletMarker = L.marker([lat, lng], { icon }).addTo(leafletMap);
-  leafletMap.setView([lat, lng], Math.max(leafletMap.getZoom(), 16));
+}
+function calNav(dir) {
+  calDate = new Date(calDate.getFullYear(), calDate.getMonth()+dir, 1);
+  renderCal();
+}
+function renderCal() {
+  var y=calDate.getFullYear(), m=calDate.getMonth();
+  document.getElementById('cal-month-label').textContent = MESES[m]+' '+y;
+  var grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  DIAS.forEach(function(d){ var el=document.createElement('div'); el.className='cal-day-name'; el.textContent=d; grid.appendChild(el); });
+  var first=new Date(y,m,1).getDay(), total=new Date(y,m+1,0).getDate(), today=new Date();
+  for(var i=0;i<first;i++){ var el=document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el); }
+  for(var d=1;d<=total;d++){
+    (function(day){
+      var el=document.createElement('div'); el.className='cal-day'; el.textContent=day;
+      if(today.getDate()===day&&today.getMonth()===m&&today.getFullYear()===y) el.classList.add('today');
+      if(calSel&&calSel.getDate()===day&&calSel.getMonth()===m&&calSel.getFullYear()===y) el.classList.add('selected');
+      el.addEventListener('click', function(e){ e.stopPropagation(); selectDay(y,m,day); });
+      grid.appendChild(el);
+    })(d);
+  }
+}
+function selectDay(y,m,d) {
+  calSel = new Date(y,m,d);
+  var dia=DIALARG[calSel.getDay()]; dia=dia.charAt(0).toUpperCase()+dia.slice(1);
+  var mes=MESLARG[m]; mes=mes.charAt(0).toUpperCase()+mes.slice(1);
+  document.getElementById('f-fecha').value = dia+' '+d+' de '+mes;
+  closeAll(); updateCard();
 }
 
-function closeMap() {
-  document.getElementById('map-modal').classList.remove('open');
-  document.getElementById('map-suggestions').classList.remove('open');
-  document.getElementById('map-suggestions').innerHTML = '';
+document.getElementById('f-fecha').addEventListener('click', openCal);
+document.getElementById('btn-open-cal').addEventListener('click', function(e){ e.stopPropagation(); openCal(); });
+document.getElementById('cal-prev').addEventListener('click', function(e){ e.stopPropagation(); calNav(-1); });
+document.getElementById('cal-next').addEventListener('click', function(e){ e.stopPropagation(); calNav(1); });
+
+// ─── Time Picker ──────────────────────────────────────────
+var tH=18, tM=0;
+
+function openTime() {
+  var isOpen = timeDd.classList.contains('open');
+  closeAll();
+  if (!isOpen) {
+    positionDropdown('time-dropdown','wrap-hora');
+    timeDd.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+function spinTime(part,dir) {
+  if(part==='h'){ tH=(tH+dir+24)%24; document.getElementById('t-h').textContent=String(tH).padStart(2,'0'); }
+  else{ tM=(tM+dir*15+60)%60; document.getElementById('t-m').textContent=String(tM).padStart(2,'0'); }
+}
+function confirmTime() {
+  document.getElementById('f-hora').value=String(tH).padStart(2,'0')+':'+String(tM).padStart(2,'0')+' hs';
+  closeAll(); updateCard();
 }
 
-function searchAddress(val) {
-  clearTimeout(searchTimeout);
-  const sug = document.getElementById('map-suggestions');
-  if (val.length < 3) { sug.classList.remove('open'); sug.innerHTML=''; return; }
-  searchTimeout = setTimeout(async () => {
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&format=json&limit=6&addressdetails=1`, {
-        headers: { 'User-Agent': 'TrulliPijamadas/1.0 (invitaciones@trulli.com.ar)', 'Accept-Language': 'es' }
+document.getElementById('f-hora').addEventListener('click', openTime);
+document.getElementById('btn-open-time').addEventListener('click', function(e){ e.stopPropagation(); openTime(); });
+document.getElementById('h-up').addEventListener('click', function(e){ e.stopPropagation(); spinTime('h',1); });
+document.getElementById('h-dn').addEventListener('click', function(e){ e.stopPropagation(); spinTime('h',-1); });
+document.getElementById('m-up').addEventListener('click', function(e){ e.stopPropagation(); spinTime('m',1); });
+document.getElementById('m-dn').addEventListener('click', function(e){ e.stopPropagation(); spinTime('m',-1); });
+document.getElementById('time-confirm-btn').addEventListener('click', function(e){ e.stopPropagation(); confirmTime(); });
+
+// ─── Map ──────────────────────────────────────────────────
+var mapAddr='', mapLat=null, mapLon=null, searchTm=null, lMap=null, lMarker=null;
+
+function openMap(){ document.getElementById('map-modal').classList.add('open');
+  setTimeout(function(){
+    if(!lMap){
+      lMap=L.map('leaflet-map').setView([-31.5375,-68.5364],13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(lMap);
+      var icon=makeIcon();
+      lMap.on('click',async function(e){
+        setMarker(e.latlng.lat,e.latlng.lng,icon);
+        document.getElementById('map-selected-info').innerHTML='<span style="color:#aaa;font-style:italic">Buscando...</span>';
+        try{
+          var r=await fetch('https://nominatim.openstreetmap.org/reverse?lat='+e.latlng.lat+'&lon='+e.latlng.lng+'&format=json',{headers:{'User-Agent':'TrulliPijamadas/1.0','Accept-Language':'es'}});
+          var data=await r.json(); var f=fmtAddr(data);
+          mapAddr=f; mapLat=e.latlng.lat; mapLon=e.latlng.lng;
+          document.getElementById('map-selected-info').innerHTML='&#128205; <span>'+f+'</span>';
+          document.getElementById('map-search').value=f;
+        }catch(err){ document.getElementById('map-selected-info').innerHTML='<span style="color:#e07a5f">Error</span>'; }
       });
-      const data = await res.json();
-      sug.innerHTML = '';
-      if (!data.length) {
-        sug.innerHTML = '<li style="color:#aaa;cursor:default">Sin resultados</li>';
-        sug.classList.add('open');
-        return;
-      }
-      data.forEach(item => {
-        const li = document.createElement('li');
-        const addr = item.address;
-        let formatted = '';
-        if (addr.road) {
-          formatted = addr.road;
-          if (addr.house_number) formatted += ' ' + addr.house_number;
-          const city = addr.city || addr.town || addr.village || addr.suburb || addr.county || '';
-          if (city) formatted += ', ' + city;
-          if (addr.country) formatted += ', ' + addr.country;
-        } else {
-          formatted = item.display_name.split(',').slice(0,3).join(', ');
-        }
-        li.textContent = formatted;
-        li.onclick = () => selectMapAddress(formatted, item.lat, item.lon);
+    } else { lMap.invalidateSize(); }
+  },150);
+}
+function makeIcon(){ return L.divIcon({html:'<div style="width:28px;height:28px;background:linear-gradient(135deg,#5BB8B0,#4AA9A1);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2.5px solid white;box-shadow:0 3px 10px rgba(0,0,0,.25)"></div>',iconSize:[28,28],iconAnchor:[14,28],className:''}); }
+function fmtAddr(data){ var a=data.address||{},s=a.road||'',n=a.house_number||'',c=a.city||a.town||a.village||'',p=[]; if(s){p.push(s+(n?' '+n:''));} if(c)p.push(c); return p.length?p.join(', '):data.display_name.split(',').slice(0,3).join(', '); }
+function setMarker(lat,lng,icon){ if(!icon)icon=makeIcon(); if(lMarker)lMap.removeLayer(lMarker); lMarker=L.marker([lat,lng],{icon:icon}).addTo(lMap); lMap.setView([lat,lng],Math.max(lMap.getZoom(),16)); }
+function closeMap(){ document.getElementById('map-modal').classList.remove('open'); document.getElementById('map-suggestions').classList.remove('open'); document.getElementById('map-suggestions').innerHTML=''; }
+
+document.getElementById('map-search').addEventListener('input', function(){ searchAddress(this.value); });
+async function searchAddress(val){
+  clearTimeout(searchTm); var sug=document.getElementById('map-suggestions');
+  if(val.length<3){sug.classList.remove('open');sug.innerHTML='';return;}
+  searchTm=setTimeout(async function(){
+    try{
+      var r=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(val)+'&format=json&limit=6&addressdetails=1',{headers:{'User-Agent':'TrulliPijamadas/1.0','Accept-Language':'es'}});
+      var data=await r.json(); sug.innerHTML='';
+      if(!data.length){sug.innerHTML='<li style="color:#aaa;cursor:default">Sin resultados</li>';sug.classList.add('open');return;}
+      data.forEach(function(item){
+        var li=document.createElement('li'), a=item.address;
+        li.textContent=a.road?(a.road+(a.house_number?' '+a.house_number:'')+(a.city?', '+a.city:a.town?', '+a.town:'')+(a.country?', '+a.country:'')):item.display_name.split(',').slice(0,3).join(', ');
+        li.addEventListener('click',function(){ selMapAddr(li.textContent,item.lat,item.lon); });
         sug.appendChild(li);
       });
       sug.classList.add('open');
-    } catch(e) { console.error(e); }
-  }, 400);
+    }catch(e){}
+  },400);
 }
+function selMapAddr(addr,lat,lon){ mapAddr=addr; mapLat=parseFloat(lat); mapLon=parseFloat(lon); document.getElementById('map-search').value=addr; document.getElementById('map-suggestions').classList.remove('open'); document.getElementById('map-selected-info').innerHTML='&#128205; <span>'+addr+'</span>'; if(lMap)setMarker(mapLat,mapLon); }
 
-function selectMapAddress(address, lat, lon) {
-  mapSelectedAddress = address;
-  mapSelectedLat = parseFloat(lat);
-  mapSelectedLon = parseFloat(lon);
-  document.getElementById('map-search').value = address;
-  document.getElementById('map-suggestions').classList.remove('open');
-  document.getElementById('map-selected-info').innerHTML = `📍 <span>${address}</span>`;
-  if (leafletMap) setMapMarker(mapSelectedLat, mapSelectedLon);
-}
-
-function confirmMapAddress() {
-  const val = mapSelectedAddress || document.getElementById('map-search').value;
-  if (val) {
-    document.getElementById('f-lugar').value = val;
-    updateCard();
-  }
+document.getElementById('btn-open-map').addEventListener('click', openMap);
+document.getElementById('btn-close-map').addEventListener('click', closeMap);
+document.getElementById('btn-confirm-map').addEventListener('click', function(){
+  var val=mapAddr||document.getElementById('map-search').value;
+  if(val){document.getElementById('f-lugar').value=val; updateCard();}
   closeMap();
-}
-
-// ══════════════════════════════════════
-// CARD UPDATE
-// ══════════════════════════════════════
-function updateCard() {
-  const para      = document.getElementById('f-para').value.trim();
-  const anfitrion = document.getElementById('f-anfitrion').value.trim();
-  const fecha = document.getElementById('f-fecha').value.trim();
-  const hora  = document.getElementById('f-hora').value.trim();
-  const lugar = document.getElementById('f-lugar').value.trim();
-
-  document.getElementById('out-para').textContent = para || 'Invitado';
-  document.getElementById('out-anfitrion').textContent = anfitrion || 'Anfitrión';
-
-  const outFechaHora = document.getElementById('out-fecha-hora');
-  let fechaHoraTxt = '';
-  if (fecha && hora) fechaHoraTxt = fecha + '  ·  ' + hora;
-  else if (fecha) fechaHoraTxt = fecha;
-  else if (hora) fechaHoraTxt = hora;
-  if (fechaHoraTxt) { outFechaHora.textContent = fechaHoraTxt; outFechaHora.classList.remove('empty'); }
-  else { outFechaHora.textContent = 'Fecha y hora por confirmar'; outFechaHora.classList.add('empty'); }
-
-  const outLugar = document.getElementById('out-lugar');
-  if (lugar) { outLugar.textContent = lugar; outLugar.classList.remove('empty'); }
-  else { outLugar.textContent = 'Dirección del evento'; outLugar.classList.add('empty'); }
-}
-
-['f-para','f-lugar','f-anfitrion'].forEach(id => {
-  document.getElementById(id).addEventListener('input', updateCard);
 });
 
-// ══════════════════════════════════════
-// NAVIGATION
-// ══════════════════════════════════════
-function showPreview() {
-  updateCard();
-  document.getElementById('page-form').style.display    = 'none';
-  document.getElementById('page-preview').style.display = 'flex';
-  window.scrollTo(0,0);
+// ─── Card update ──────────────────────────────────────────
+function updateCard(){
+  var para=document.getElementById('f-para').value.trim();
+  var anf=document.getElementById('f-anfitrion').value.trim();
+  var fecha=document.getElementById('f-fecha').value.trim();
+  var hora=document.getElementById('f-hora').value.trim();
+  var lugar=document.getElementById('f-lugar').value.trim();
+  document.getElementById('out-para').textContent=para||'Invitado';
+  document.getElementById('out-anfitrion').textContent=anf||'Anfitrión';
+  var fhEl=document.getElementById('out-fecha-hora'), fhTxt=fecha&&hora?fecha+'  ·  '+hora:(fecha||hora);
+  if(fhTxt){fhEl.textContent=fhTxt;fhEl.classList.remove('empty');}else{fhEl.textContent='Fecha y hora por confirmar';fhEl.classList.add('empty');}
+  var lEl=document.getElementById('out-lugar');
+  if(lugar){lEl.textContent=lugar;lEl.classList.remove('empty');}else{lEl.textContent='Dirección del evento';lEl.classList.add('empty');}
 }
-function showForm() {
-  document.getElementById('page-form').style.display    = 'flex';
-  document.getElementById('page-preview').style.display = 'none';
-}
+['f-para','f-lugar','f-anfitrion'].forEach(function(id){ document.getElementById(id).addEventListener('input',updateCard); });
 
-// ══════════════════════════════════════
-// DOWNLOAD / SHARE
-// ══════════════════════════════════════
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
+// ─── Nav ──────────────────────────────────────────────────
+document.getElementById('btn-preview').addEventListener('click', function(){ updateCard(); document.getElementById('page-form').style.display='none'; document.getElementById('page-preview').style.display='flex'; window.scrollTo(0,0); });
+document.getElementById('btn-back').addEventListener('click', function(){ document.getElementById('page-form').style.display='flex'; document.getElementById('page-preview').style.display='none'; });
 
-async function captureCard() {
-  const card = document.getElementById('invitation-card');
-  return await html2canvas(card, {
-    scale: 2,
-    useCORS: true,
-    allowTaint: false,
-    backgroundColor: '#95CEBB',
-    logging: false,
-  });
-}
+// ─── Download / Share ─────────────────────────────────────
+function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(function(){t.classList.remove('show');},2800); }
+async function captureCard(){ return await html2canvas(document.getElementById('invitation-card'),{scale:2,useCORS:true,allowTaint:false,backgroundColor:'#95CEBB',logging:false}); }
 
-async function downloadImage() {
-  const btn = document.getElementById('btn-dl');
-  btn.disabled = true;
-  btn.textContent = 'Generando...';
-  try {
-    const canvas = await captureCard();
-    const link = document.createElement('a');
-    const nombre = document.getElementById('f-para').value || 'invitacion';
-    link.download = 'trulli-' + nombre.toLowerCase().replace(/\s+/g,'-') + '.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    showToast('✓ Invitación descargada');
-  } catch(e) { showToast('Error al generar imagen'); }
-  btn.disabled = false;
-  btn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar';
-}
+document.getElementById('btn-dl').addEventListener('click', async function(){
+  var btn=this; btn.disabled=true; btn.textContent='Generando...';
+  try{ var canvas=await captureCard(); var link=document.createElement('a'); var n=document.getElementById('f-para').value||'invitacion'; link.download='trulli-'+n.toLowerCase().replace(/\s+/g,'-')+'.png'; link.href=canvas.toDataURL('image/png'); link.click(); showToast('✓ Invitación descargada'); }
+  catch(e){ showToast('Error al generar imagen'); }
+  btn.disabled=false; btn.innerHTML='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Descargar';
+});
 
-async function shareImage() {
-  try {
-    const canvas = await captureCard();
-    canvas.toBlob(async blob => {
-      const nombre = document.getElementById('f-para').value || 'invitacion';
-      const file = new File([blob], 'trulli-' + nombre.toLowerCase().replace(/\s+/g,'-') + '.png', { type: 'image/png' });
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: '¡Pijamada Trulli!', text: '¡Estás invitado/a! 🌙' });
-        } catch(e) {
-          if (e.name !== 'AbortError') fallbackDl(canvas);
-        }
-      } else { fallbackDl(canvas); }
-    }, 'image/png');
-  } catch(e) { showToast('Error al compartir'); }
-}
+document.getElementById('btn-share').addEventListener('click', async function(){
+  try{
+    var canvas=await captureCard();
+    canvas.toBlob(async function(blob){
+      var n=document.getElementById('f-para').value||'invitacion';
+      var file=new File([blob],'trulli-'+n.toLowerCase().replace(/\s+/g,'-')+'.png',{type:'image/png'});
+      if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+        try{ await navigator.share({files:[file],title:'¡Pijamada Trulli!',text:'¡Estás invitado/a! 🌙'}); }
+        catch(e){ if(e.name!=='AbortError'){ var l=document.createElement('a'); l.download='trulli-pijamada.png'; l.href=canvas.toDataURL('image/png'); l.click(); showToast('Guardá y compartí por WhatsApp'); } }
+      } else { var l=document.createElement('a'); l.download='trulli-pijamada.png'; l.href=canvas.toDataURL('image/png'); l.click(); showToast('Guardá y compartí por WhatsApp'); }
+    },'image/png');
+  }catch(e){ showToast('Error al compartir'); }
+});
 
-function fallbackDl(canvas) {
-  const link = document.createElement('a');
-  link.download = 'trulli-pijamada.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-  showToast('Guardá la imagen y compartila por WhatsApp');
-}
-
-// Init
-renderCal();
-updateCard();
+// ─── Init ─────────────────────────────────────────────────
+renderCal(); updateCard();
 </script>
 </body>
 </html>
