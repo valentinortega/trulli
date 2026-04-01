@@ -75,6 +75,7 @@ body{
   box-shadow:0 16px 56px rgba(28,71,83,.22);
   border:1.5px solid rgba(91,184,176,.2);
   padding:18px;display:none;width:300px;
+  max-height:90vh;overflow-y:auto;
 }
 .picker-dropdown.open{display:block;}
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
@@ -363,11 +364,31 @@ function positionDropdown(ddId, anchorId) {
   var anchor = document.getElementById(anchorId);
   var dd = document.getElementById(ddId);
   var rect = anchor.getBoundingClientRect();
-  dd.style.top = (rect.bottom + window.scrollY + 6) + 'px';
-  dd.style.left = rect.left + 'px';
-  var w = dd.offsetWidth || 300;
-  if (rect.left + w > window.innerWidth - 8)
-    dd.style.left = Math.max(8, window.innerWidth - w - 8) + 'px';
+  var vw = window.innerWidth;
+  var vh = window.innerHeight;
+
+  // Ancho adaptado a mobile
+  var isMobile = vw < 500;
+  var ddW = isMobile ? Math.min(vw - 24, 340) : 300;
+  dd.style.width = ddW + 'px';
+
+  // Horizontal: sin salirse de pantalla
+  var left = rect.left;
+  if (left + ddW > vw - 8) left = Math.max(8, vw - ddW - 8);
+  dd.style.left = left + 'px';
+
+  // Vertical: position:fixed usa coordenadas viewport (NO sumar scrollY)
+  // Mostrar arriba si no hay espacio abajo
+  dd.style.display = 'block'; // temporal para medir altura real
+  var ddH = dd.offsetHeight || 320;
+  dd.style.display = '';
+  var spaceBelow = vh - rect.bottom - 8;
+  if (spaceBelow >= ddH || spaceBelow >= 250) {
+    dd.style.top = (rect.bottom + 6) + 'px';
+  } else {
+    dd.style.top = Math.max(8, rect.top - ddH - 6) + 'px';
+  }
+  dd.style.bottom = 'auto';
 }
 
 var overlay = document.getElementById('overlay');
