@@ -5,23 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trulli Pijamadas — Invitaciones</title>
 
-<!-- Favicon -->
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/favicon%20trulli.png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/favicon%20trulli.png">
 
-<!-- Open Graph -->
 <meta property="og:title" content="Trulli Pijamadas — Invitaciones">
 <meta property="og:description" content="Creá tu invitación personalizada para la pijamada">
 <meta property="og:image" content="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/TRULLI%20OG.png">
 <meta property="og:url" content="https://trulli.vercel.app">
 <meta property="og:type" content="website">
+
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <style>
 :root {
-  /* ── Paleta oficial Trulli ── */
   --acqua:       #5BB8B0;
   --acqua-mid:   #74C3BC;
   --acqua-light: #A8D8D4;
@@ -31,21 +30,20 @@
   --notte:       #1C4753;
   --notte-mid:   #2A5F70;
   --sand:        #D9CFA8;
-
-  /* aliases usados internamente */
   --teal:        var(--acqua);
   --teal-dark:   #4AA9A1;
   --teal-light:  var(--acqua-ghost);
   --cream:       var(--calce);
   --text:        var(--notte);
   --text-soft:   #5A8A96;
+  --hero-teal:   #8ECFC9;
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 
 body {
   font-family: 'Nunito', sans-serif;
-  background: var(--calce);
+  background: #C8E8E5;
   min-height: 100vh;
   display: flex;
   align-items: flex-start;
@@ -53,19 +51,6 @@ body {
   padding: 0 0 60px;
   position: relative;
   overflow-x: hidden;
-}
-
-/* ── Fondo decorativo ── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 10% 0%, rgba(91,184,176,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(91,184,176,0.12) 0%, transparent 55%),
-    var(--calce);
-  z-index: 0;
-  pointer-events: none;
 }
 
 /* ══════════════════════ FORM PAGE ══════════════════════ */
@@ -80,70 +65,29 @@ body::before {
   z-index: 1;
 }
 
-/* ── Hero header ── */
+/* ── Hero: imagen del recurso PNG ── */
 .form-hero {
   width: 100%;
-  background: var(--notte);
-  padding: 40px 32px 36px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 22px;
   position: relative;
-  overflow: hidden;
-}
-.form-hero::before {
-  content: '';
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 220px; height: 220px;
-  border-radius: 50%;
-  background: rgba(91,184,176,0.12);
-  pointer-events: none;
-}
-.form-hero::after {
-  content: '';
-  position: absolute;
-  bottom: -80px; left: -40px;
-  width: 180px; height: 180px;
-  border-radius: 50%;
-  background: rgba(91,184,176,0.08);
-  pointer-events: none;
-}
-
-.form-logo img {
-  height: 54px;
-  filter: brightness(0) invert(1);
-  display: block;
-}
-
-/* Título "Completá tus datos" desde imagen */
-.form-title-img {
-  width: 100%;
-  max-width: 300px;
-  display: block;
-  /* invertir a blanco */
-  filter: brightness(0) invert(1);
-}
-
-/* ── Ola decorativa entre hero y card ── */
-.form-wave {
-  width: 100%;
-  display: block;
-  margin-bottom: -2px;
   line-height: 0;
-}
-.form-wave svg {
-  display: block;
-  width: 100%;
+  /* Fondo teal mientras carga la imagen */
+  background: #8ECFC9;
 }
 
-/* ── Card principal ── */
+.form-hero-img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* ── Card principal: arranca justo bajo el hero ── */
 .form-card {
   background: white;
   width: 100%;
   padding: 32px 28px 28px;
   box-shadow: 0 4px 40px rgba(28,71,83,0.08);
+  /* borde superior redondeado para solaparse suavemente con el hero */
+  border-radius: 0;
 }
 
 .field-group { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
@@ -163,7 +107,13 @@ body::before {
 }
 .field label svg { opacity: 1; flex-shrink: 0; color: var(--acqua); }
 
-.input-wrap { position: relative; display: flex; align-items: center; }
+/* ── Input wrap — z-index elevado para que los dropdowns queden sobre el overlay ── */
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  z-index: 10; /* los dropdowns hijos heredan este contexto */
+}
 .input-wrap input, .input-wrap textarea {
   width: 100%;
   background: var(--calce);
@@ -200,10 +150,10 @@ body::before {
   display: flex;
   align-items: center;
   transition: opacity 0.15s;
+  z-index: 11;
 }
 .input-icon-btn:hover { opacity: 1; }
 
-/* ─── Separador decorativo entre campos ─── */
 .field-divider {
   width: 100%;
   height: 1px;
@@ -215,7 +165,8 @@ body::before {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
-  z-index: 200;
+  /* z-index MUY alto: debe quedar por encima del overlay (z=100) */
+  z-index: 300;
   background: white;
   border-radius: 20px;
   box-shadow: 0 16px 56px rgba(28,71,83,0.16);
@@ -223,6 +174,8 @@ body::before {
   padding: 18px;
   display: none;
   min-width: 300px;
+  /* Evitar que el click se propague al overlay */
+  pointer-events: auto;
 }
 .picker-dropdown.open { display: block; }
 
@@ -274,9 +227,10 @@ body::before {
   cursor: pointer;
   color: var(--notte);
   transition: background 0.12s, color 0.12s;
+  user-select: none;
 }
 .cal-day:hover { background: var(--acqua-ghost); }
-.cal-day.empty { cursor: default; }
+.cal-day.empty { cursor: default; pointer-events: none; }
 .cal-day.today { font-weight: 900; color: var(--acqua); }
 .cal-day.selected { background: var(--acqua); color: white; font-weight: 800; }
 .cal-day.other-month { color: #c5d8d6; }
@@ -320,6 +274,7 @@ body::before {
   font-size: 15px;
   line-height: 1;
   transition: background 0.12s;
+  user-select: none;
 }
 .time-spin button:hover { background: var(--acqua-ghost); }
 .time-val {
@@ -482,7 +437,7 @@ body::before {
 
 /* ══ BTN PREVIEW ══ */
 .btn-preview-wrap {
-  padding: 0 28px 32px;
+  padding: 24px 28px 32px;
   background: white;
   width: 100%;
 }
@@ -544,6 +499,20 @@ body::before {
   text-transform: uppercase;
   margin-left: 8px;
 }
+
+/* ══════════════════════ OVERLAY ══════════════════════
+   z-index=200 para quedar POR DEBAJO de los dropdowns (z=300)
+   pero por encima del resto del contenido (z=1).
+   Esto evita que "robe" los clicks dentro del picker.
+*/
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  background: transparent;
+}
+.overlay.open { display: block; }
 
 /* ══════════════════════ PREVIEW PAGE ══════════════════════ */
 #page-preview {
@@ -754,14 +723,6 @@ body::before {
   pointer-events: none;
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: none;
-}
-.overlay.open { display: block; }
 </style>
 </head>
 <body>
@@ -769,28 +730,17 @@ body::before {
 <!-- ══════════════════ PÁGINA 1: FORMULARIO ══════════════════ -->
 <div id="page-form">
 
-  <!-- Hero con notte -->
+  <!-- Hero: recurso PNG completo -->
   <div class="form-hero">
-    <div class="form-logo">
-      <img src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/marca.png" alt="Trulli Pijamadas" crossorigin="anonymous">
-    </div>
     <img
-      class="form-title-img"
-      src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/completa%20tus%20datos.png"
-      alt="Completá tus datos"
+      class="form-hero-img"
+      src="https://raw.githubusercontent.com/valentinortega/trulli/refs/heads/main/Recurso%205.png"
+      alt="Completá los datos — Trulli Pijamadas"
       crossorigin="anonymous"
     >
   </div>
 
-  <!-- Ola de transición notte → blanco -->
-  <div class="form-wave">
-    <svg viewBox="0 0 480 36" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,0 C120,36 360,36 480,0 L480,0 L0,0 Z" fill="#1C4753"/>
-      <path d="M0,0 C120,36 360,36 480,0 L480,36 L0,36 Z" fill="white"/>
-    </svg>
-  </div>
-
-  <!-- Card de campos -->
+  <!-- Card de campos: inmediatamente bajo el hero, sin ola intermedia -->
   <div class="form-card">
     <div class="field-group">
 
@@ -827,11 +777,12 @@ body::before {
           Fecha
         </label>
         <div class="input-wrap" style="position:relative">
-          <input type="text" id="f-fecha" placeholder="Seleccioná una fecha" readonly style="cursor:pointer; padding-right: 44px;" onclick="toggleCal()">
-          <button class="input-icon-btn" onclick="toggleCal()" type="button">
+          <input type="text" id="f-fecha" placeholder="Seleccioná una fecha" readonly style="cursor:pointer; padding-right: 44px;" onclick="toggleCal(event)">
+          <button class="input-icon-btn" onclick="toggleCal(event)" type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3h-1V1h-2v2H8V1H6v2H5C3.9 3 3 3.9 3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
           </button>
-          <div class="picker-dropdown" id="cal-dropdown">
+          <!-- El dropdown va DENTRO del input-wrap para heredar z-index:10 -->
+          <div class="picker-dropdown" id="cal-dropdown" onclick="event.stopPropagation()">
             <div class="cal-header">
               <button class="cal-nav" onclick="calNav(-1)" type="button">&#8249;</button>
               <span class="cal-month-label" id="cal-month-label"></span>
@@ -851,11 +802,11 @@ body::before {
           Hora
         </label>
         <div class="input-wrap" style="position:relative">
-          <input type="text" id="f-hora" placeholder="Seleccioná la hora" readonly style="cursor:pointer; padding-right:44px;" onclick="toggleTime()">
-          <button class="input-icon-btn" onclick="toggleTime()" type="button">
+          <input type="text" id="f-hora" placeholder="Seleccioná la hora" readonly style="cursor:pointer; padding-right:44px;" onclick="toggleTime(event)">
+          <button class="input-icon-btn" onclick="toggleTime(event)" type="button">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm.5 5v6l5.25 3.15-.75 1.23L11 14V7h1.5z"/></svg>
           </button>
-          <div class="picker-dropdown" id="time-dropdown">
+          <div class="picker-dropdown" id="time-dropdown" onclick="event.stopPropagation()">
             <div class="time-picker">
               <div class="time-col">
                 <span class="time-label">Hora</span>
@@ -899,7 +850,7 @@ body::before {
     </div>
   </div>
 
-  <!-- Botón fuera del card, mismo ancho -->
+  <!-- Botón Ver invitación -->
   <div class="btn-preview-wrap">
     <button class="btn-preview" onclick="showPreview()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -916,7 +867,11 @@ body::before {
 
 </div>
 
-<!-- Overlay -->
+<!--
+  OVERLAY: z-index 200 → por debajo de los dropdowns (z=300)
+  El click en el overlay cierra los pickers SIN interferir con clicks dentro del picker,
+  ya que los dropdowns tienen z-index mayor y stopPropagation().
+-->
 <div class="overlay" id="overlay" onclick="closeAll()"></div>
 
 <!-- ══════════════════ MAPA MODAL ══════════════════ -->
@@ -1003,7 +958,8 @@ const DIAS_LARGO = ['domingo','lunes','martes','miércoles','jueves','viernes','
 let calDate = new Date();
 let calSelected = null;
 
-function toggleCal() {
+function toggleCal(e) {
+  if (e) e.stopPropagation();
   const dd = document.getElementById('cal-dropdown');
   const td = document.getElementById('time-dropdown');
   td.classList.remove('open');
@@ -1038,10 +994,12 @@ function renderCal() {
     const el = document.createElement('div');
     el.className = 'cal-day';
     el.textContent = d;
-    const thisDate = new Date(y, m, d);
     if (today.getDate()===d && today.getMonth()===m && today.getFullYear()===y) el.classList.add('today');
     if (calSelected && calSelected.getDate()===d && calSelected.getMonth()===m && calSelected.getFullYear()===y) el.classList.add('selected');
-    el.onclick = () => selectDay(y, m, d);
+    el.addEventListener('click', function(ev) {
+      ev.stopPropagation();
+      selectDay(y, m, d);
+    });
     grid.appendChild(el);
   }
 }
@@ -1062,7 +1020,8 @@ function selectDay(y, m, d) {
 // ══════════════════════════════════════
 let tH = 18, tM = 0;
 
-function toggleTime() {
+function toggleTime(e) {
+  if (e) e.stopPropagation();
   const dd = document.getElementById('time-dropdown');
   const cd = document.getElementById('cal-dropdown');
   cd.classList.remove('open');
